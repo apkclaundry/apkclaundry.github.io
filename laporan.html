@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Pendapatan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/laporan.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <img src="src/img/logo.png" alt="Logo Laundry POS">
+        <h1>Laundry POS</h1>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="karyawan.html">Karyawan</a></li>
+          <li><a href="stock.html">stock</a></li>
+          <li><a href="laporan.html">Laporan</a></li>
+        </ul>
+        <button class="burger">
+          <i class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+  <div class="container my-5">
+    <h1 class="text-center mb-4 text-primary">Laporan Pendapatan</h1>
+
+    <!-- Summary Section -->
+    <div class="row mb-5">
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-primary text-white text-center">
+          <div class="card-body">
+            <h5>Harian</h5>
+            <h2 id="dailyTotal">Rp 0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-success text-white text-center">
+          <div class="card-body">
+            <h5>Mingguan</h5>
+            <h2 id="weeklyTotal">Rp 0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-warning text-white text-center">
+          <div class="card-body">
+            <h5>Bulanan</h5>
+            <h2 id="monthlyTotal">Rp 0</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+      <div class="col-md-6 mx-auto">
+        <select id="filterPeriod" class="form-select shadow">
+          <option value="daily">Pendapatan Harian</option>
+          <option value="weekly">Pendapatan Mingguan</option>
+          <option value="monthly">Pendapatan Bulanan</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Pendapatan Per Pelanggan</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th>Nama Pelanggan</th>
+                <th>Layanan</th>
+                <th>Tanggal</th>
+                <th>Jumlah Transaksi</th>
+                <th>Total Pendapatan (Rp)</th>
+              </tr>
+            </thead>
+            <tbody id="revenueTableBody">
+              <!-- Data dynamically added by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+        
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="src/js/laporan.js"></script>
+</body>
+</html>

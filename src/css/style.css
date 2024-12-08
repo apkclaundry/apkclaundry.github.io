@@ -1,0 +1,276 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  
+  header {
+    background-color: #545454;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  main {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1,
+  h2 {
+    margin: 0;
+  }
+  
+  .order-form {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  input,
+  select,
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  input[readonly] {
+    background-color: #f5f5f5;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  button {
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .btn-reset {
+    background-color: #f44336;
+    color: white;
+    border: none;
+  }
+  
+  .btn-submit {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+  }
+  
+  /* Untuk grup input dan tombol */
+  .weight-group .input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .weight-group input {
+    flex: 2;
+    margin-right: 10px;
+  }
+  
+  .btn-calculate {
+    flex: 1;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .btn-calculate:hover {
+    background-color: #1e88e5;
+  }
+  
+  /* Tabel data (desktop) */
+  #order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  #order-table th,
+  #order-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  /* List data (responsif) */
+  .order-list {
+    display: none; /* Default: tersembunyi */
+    margin-top: 20px;
+  }
+  
+  .order-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Header styling */
+  header {
+    background-color: #666666;
+    color: white;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .logo h1 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  nav {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .nav-links li a:hover {
+    text-decoration: underline;
+  }
+  
+  .burger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  button.edit, button.delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #007BFF; /* Warna biru untuk ikon */
+    margin-right: 8px;
+  }
+  
+  button.edit:hover, button.delete:hover {
+    color: #0056b3; /* Warna saat hover */
+  }
+  
+  button.delete {
+    color: #dc3545; /* Warna merah untuk tombol hapus */
+  }
+  
+  button.delete:hover {
+    color: #b21f2d;
+  }
+  /* List data stok untuk mode responsif */
+.stock-list {
+    display: none; /* Default: disembunyikan */
+    margin-top: 20px;
+  }
+  
+  .stock-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .stock-item p {
+    margin: 5px 0;
+  }
+  
+  .stock-item .actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Responsif: tampilkan list, sembunyikan tabel */
+  @media screen and (max-width: 768px) {
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      background-color: #4CAF50;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 100%;
+      text-align: center;
+    }
+  
+    .nav-links.active {
+      display: flex;
+    }
+  
+    .burger {
+      display: block;
+    }
+    #order-table {
+      display: none;
+    }
+    .order-list {
+      display: block;
+    }
+    #stock-table {
+        display: none; /* Sembunyikan tabel pada layar kecil */
+      }
+    
+      .stock-list {
+        display: block; /* Tampilkan list */
+      }
+  }
+  
+  
+  

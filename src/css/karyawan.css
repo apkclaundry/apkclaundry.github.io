@@ -1,0 +1,227 @@
+/* Styling untuk tombol aksi */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+.actions {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .actions button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 10px;
+  }
+  
+  .actions .edit {
+    color: blue;
+  }
+  
+  .actions .delete {
+    color: red;
+  }
+  
+  /* Container & Form Styling */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9; /* Update */
+    border-radius: 10px; /* Update */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Update */
+  }
+  
+  .title, .subtitle {
+    text-align: center;
+    color: #2c3e50;
+  }
+  
+  .title {
+    font-size: 2em; /* Update */
+    color: #3498db; /* Update */
+  }
+  
+  .subtitle {
+    font-size: 1.5em; /* Update */
+    color: #2ecc71; /* Update */
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #34495e; /* Update */
+    font-weight: bold; /* Update */
+  }
+  
+  #employee-id, #employee-name, #employee-role, .btn-save {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px; /* Update */
+  }
+  
+  .btn-save {
+    background-color: #2ecc71; /* Update */
+    color: white; /* Update */
+    border: none; /* Update */
+    cursor: pointer; /* Update */
+    transition: background-color 0.3s; /* Update */
+  }
+  
+  .btn-save:hover {
+    background-color: #27ae60; /* Update */
+  }
+  
+  /* Table Styling */
+  #employee-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #fff; /* Update */
+    border-radius: 10px; /* Update */
+    overflow: hidden; /* Update */
+  }
+  
+  #employee-table th, #employee-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  #employee-table th {
+    background-color: #3498db; /* Update */
+    color: white; /* Update */
+    font-weight: bold; /* Update */
+  }
+  
+  #employee-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Update */
+  }
+  
+  #employee-table tr:hover {
+    background-color: #f1c40f; /* Update */
+  }
+  
+  /* Mobile-Friendly List Styling */
+  .employee-list {
+    display: none;
+  }
+  
+  .employee-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Header styling */
+  header {
+    background-color: #666666;
+    color: white;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .logo h1 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  nav {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .nav-links li a:hover {
+    text-decoration: underline;
+  }
+  
+  .burger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      background-color: #4CAF50;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 100%;
+      text-align: center;
+    }
+  
+    .nav-links.active {
+      display: flex;
+    }
+  
+    .burger {
+      display: block;
+    }
+    #employee-table {
+      display: none;
+    }
+    .employee-list {
+      display: block;
+    }
+  }
+  
+  
+  
