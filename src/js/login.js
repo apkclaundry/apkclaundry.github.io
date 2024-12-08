@@ -41,3 +41,8 @@ function loginUser() {
 }
 
 window.loginUser = loginUser;
+
+document.getElementById('back-btn').addEventListener('click', function (e) {
+    e.preventDefault(); // Mencegah default button behavior
+    window.location.href = 'index.html'; // Redirect ke halaman LP.html
+});
