@@ -13,38 +13,28 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="loginForm">
-            <input type="email" id="email" name="email" placeholder="E-Mail" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
-            <button id="login-btn">Login</button>
-            <button id="back-btn" class="link-style">Back to main menu</button>
-            <div class="forgot-password">
-                <!-- Google Login Button -->
-                <div id="g_id_onload" 
-                     data-client_id="861139910885-5flb4pjosqce4ecldalgqkuj66kf2eru.apps.googleusercontent.com"
-                     data-callback="handleCredentialResponse">
-                </div>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-shape="rectangular"
-                     data-theme="outline"
-                     data-text="signin_with"
-                     data-size="large">
+        <div class="loginform">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
             </div>
-            <div class="whats-auth">
-                <a href="https://itung.in.my.id/login/">Use Whatsauth</a>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
             </div>
+            <div class="form-group">
+                <button type="button" onclick="loginUser()">Login</button>
+                <button id="back-btn" class="link-style">Back to main menu</button>
             </div>
             <div class="forgot-password">
-                <a href="Register.html">Don't have an account?</a>
+                <a href="register.html">Don't have an account? Register</a>
             </div>
-            <div class="forgot-password">
-                <a href="Forgot_password.html">Forgot your password?</a>
-            </div>
-        </form>
+
+            <div class="message" id="message"></div>
+        </div>
     </div>
 
-    <script src="src/js/login.js"></script>
+    <script src="src/js/login.js" type="module"></script>
     <!-- <script>
         // Ganti "YOUR_CLIENT_ID" dengan Client ID dari Google OAuth Anda.
         const CLIENT_ID = "861139910885-5flb4pjosqce4ecldalgqkuj66kf2eru.apps.googleusercontent.com";
@@ -72,7 +62,7 @@
             alert("Login berhasil! ID Token diterima.");
             
             // Redirect ke halaman utama atau dashboard
-            window.location.href = "https://itung.in.my.id/dashboard/"; // Sesuaikan halaman redirect
+            window.location.href = "index.html"; // Sesuaikan halaman redirect
         }
     </script>
     
