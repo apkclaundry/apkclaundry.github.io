@@ -1,110 +1,256 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laundry POS - Input Pesanan</title>
-    <link rel="stylesheet" href="src/css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itungin.my.id</title>
+  <link rel="stylesheet" href="src/css/landingp.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css">
+  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
+</head>
 
-  </head>
-  <body>
-    <header>
-      <div class="header-container">
-        <div class="logo">
-          <img src="src/img/logo.png" alt="Logo Laundry POS">
-          <h1>Laundry POS</h1>
-        </div>
-        <nav>
-          <ul class="nav-links">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="karyawan.html">Karyawan</a></li>
-            <li><a href="stock.html">stock</a></li>
-            <li><a href="laporan.html">Laporan</a></li>
-          </ul>
-          <button class="burger">
-            <i class="fas fa-bars"></i>
-          </button>
-        </nav>
+<body>
+  <!-- Header -->
+<header id="main-header">
+  <div class="logo">LOGO POS</div>
+  <nav>
+    <a href="#fitur">Fitur</a>
+    <a href="#testimoni">Testimoni</a>
+    <a href="#hubungi">Hubungi Kami</a>
+    <a href="Dashboard_blank.html">Coba Dashboard</a>
+  </nav>  
+  <div>
+    <a href="login.html" class="btn btn-outline-light">Login</a>
+    <button id="darkModeToggle" class="btn btn-outline-light ms-2">
+      <i id="darkModeIcon" class="fas fa-moon"></i>
+    </button>
+    <span class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></span>
+  </div>
+  
+</header>
+
+<!-- Sidebar for Mobile -->
+<div class="sidebar" id="sidebar">
+  <span class="close-btn" onclick="toggleSidebar()">&times;</span>
+  <a href="#fitur" onclick="toggleSidebar()">Fitur</a>
+  <a href="#testimoni" onclick="toggleSidebar()">Testimoni</a>
+  <a href="#hubungi" onclick="toggleSidebar()">Hubungi Kami</a>
+  <a href="Dashboard_blank.html" onclick="toggleSidebar()">Coba Dashboard</a>
+</div>
+
+<!-- Hero Section -->
+<section class="hero">
+  <h1>Kelola Transaksi Anda dengan<br> Mudah dan Cepat</h1>
+  <p>Website POS modern untuk bisnis Anda,<br> memudahkan pengelolaan transaksi harian secara efisien dan aman.</p>
+  <a href="Register.html" class="btn btn-outline-light">Daftar Sekarang</a>
+</section>
+
+
+  <!-- Fitur Unggulan -->
+  <section id="fitur">
+    <h2>Fitur Unggulan</h2>
+    <div class="fitur-container">
+      <div class="fitur-item">
+        <i class="fas fa-check-circle"></i>
+        <h3>Kemudahan Penggunaan</h3>
+        <p>POS yang user-friendly dan intuitif.</p>
       </div>
-    </header>
-    <main>
-      <!-- Formulir Pesanan -->
-      <form id="order-form">
-        <div class="form-group">
-          <label for="customer-name">Nama Pelanggan</label>
-          <input
-            type="text"
-            id="customer-name"
-            name="customer_name"
-            placeholder="Masukkan nama pelanggan"
-            required
-          />
+      <div class="fitur-item">
+        <i class="fas fa-lock"></i>
+        <h3>Keamanan Data</h3>
+        <p>Data Anda aman dengan enkripsi tingkat tinggi.</p>
+      </div>
+      <div class="fitur-item">
+        <i class="fas fa-chart-line"></i>
+        <h3>Analisis Bisnis</h3>
+        <p>Fitur analitik untuk membantu keputusan bisnis.</p>
+      </div>
+    </div>
+  </section>
+  
+
+<!-- Testimoni -->
+<section id="testimoni">
+  <h2>Testimoni Pengguna</h2>
+  <div class="testimonial-container">
+    <div class="testimonial-card">
+      <blockquote>"POS ini sangat membantu bisnis saya."</blockquote>
+      <p>- Nama Pelanggan, Bisnis</p>
+    </div>
+    <div class="testimonial-card">
+      <blockquote>"Sistem yang efisien dan mudah digunakan!"</blockquote>
+      <p>- Nama Pelanggan Lain, Usaha</p>
+    </div>
+    <div class="testimonial-card">
+      <blockquote>"Pelayanan yang sangat memuaskan, sangat direkomendasikan."</blockquote>
+      <p>- Pelanggan Ketiga, Startup</p>
+    </div>
+    <div class="testimonial-card">
+      <blockquote>"Membuat pembukuan lebih mudah dan terorganisir."</blockquote>
+      <p>- Pelanggan Keempat, Toko Retail</p>
+    </div>
+  </div>
+</section>
+
+
+
+ <!-- Hubungi Kami -->
+<section id="hubungi" class="d-flex justify-content-center align-items-center py-5 bg-light">
+  <div class="container shadow-lg rounded-4 bg-white overflow-hidden">
+    <div class="row g-0">
+      
+      <!-- Kolom Kiri: Gambar -->
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="h-100 w-100" style="background-image: url('static/img/LPContact.jpg'); background-size: cover; background-position: center;"></div>
+      </div>
+
+      <!-- Kolom Kanan: Formulir Kontak -->
+      <div class="col-lg-6 p-5 d-flex align-items-center">
+        <div class="w-100">
+          <h2 class="pb-4 text-center fw-bold text-primary">Hubungi Kami</h2>
+          
+          <!-- Form Input -->
+          <form id="contactForm">
+            <div class="mb-4">
+              <input type="text" class="form-control" id="name" placeholder="Nama" required pattern="[A-Za-z\s]{3,}">
+              </div>
+            
+            <div class="mb-4">
+              <input type="email" class="form-control" id="email" placeholder="Email" required>
+            </div>
+            
+            <div class="mb-4">
+              <input type="tel" class="form-control" id="phone" placeholder="No. Telepon" required pattern="\d{10,}">
+            </div>
+            
+            <div class="mb-4">
+              <textarea class="form-control" id="message" rows="4" placeholder="Pesan Anda" required minlength="10"></textarea>
+            </div>
+            
+            <!-- Button Send di pojok kanan -->
+            <div class="text-end">
+              <button type="submit" class="btn btn-outline-primary btn-lg px-4">Send Message</button>
+            </div>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="customer-phone">Nomor Telepon</label>
-          <input
-            type="tel"
-            id="customer-phone"
-            name="customer_phone"
-            placeholder="08xxxxxxxxxx"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="service-type">Jenis Layanan</label>
-          <select id="service-type" name="service_type" required>
-            <option value="cuci">Cuci</option>
-            <option value="setrika">Setrika</option>
-            <option value="cuci-setrika">Cuci + Setrika</option>
-          </select>
-        </div>
-        <div class="form-group weight-group">
-          <label for="weight">Berat (kg) / Jumlah Item</label>
-          <div class="input-group">
-            <input
-              type="number"
-              id="weight"
-              name="weight"
-              placeholder="Contoh: 3.5"
-              step="0.1"
-              min="0"
-              required
-            />
-            <button type="button" id="calculate-btn" class="btn-calculate">
-              Hitung
-            </button>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+  
+  
+
+  <!-- Footer -->
+  <footer id="site-footer">
+    <div style="background-color: rgba(33, 150, 243, 0.7);" class="py-5">
+      <div class="container">
+        <div style="margin: 1rem;" class="row">
+          <div class="col-md-6 col-xl-3 col-sm-12">
+            <h5 class="pb-3"><i class="fa-solid fa-user-group pe-1"></i> About us</h5>
+            <span >Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut provident aperiam quam culpa voluptatem quidem voluptate architecto ducimus iure obcaecati?</span>
+          </div>
+          <div class="col-md-6 col-xl-3 col-sm-12">
+            <h5 class="pb-3"><i class="fa-solid fa-link pe-1"></i> Important links</h5>
+            <ul>
+              <li><a href="#" class="text-decoration-none">About us</a></li>
+              <li><a href="#" class="text-decoration-none">Privacy policy</a></li>
+              <li><a href="#" class="text-decoration-none">Terms of services</a></li>
+            </ul>
+          </div>
+          <div class="col-md-6 col-xl-3 col-sm-12">
+            <h5 class="pb-3"><i class="fa-solid fa-location-dot pe-1"></i> Our location</h5>
+            <span>
+              Sukasari<br>
+              Kec. Sukasari, Kota Bandung, Jawa Barat<br>
+              40151, Indonesia<br>
+            </span>
+          </div>
+          <div class="col-md-6 col-xl-3 col-sm-12">
+            <h5 class="pb-3"><i class="fa-solid fa-paper-plane pe-1"></i> Stay updated</h5>
+            <form>
+              <input type="text" class="w-100 mb-2 form-control" name="" placeholder="Email ID">
+              <button class="w-100 btn btn-dark">Subscribe now</button>
+            </form>
           </div>
         </div>
-        <div class="form-group">
-          <label for="total-price">Total Harga</label>
-          <input type="text" id="total-price" name="total_price" readonly />
+      </div>
+    </div>
+    <div class="bg-dark py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <ul class="list-inline mb-0">
+              <li class="list-inline-item"><a class="btn btn-outline-secondary" href="https://wa.me/6285922024007?text=Halo%20saya%20ingin%20bertanya"><i class="fa-brands fa-whatsapp"></i></a></li>
+              <li class="list-inline-item"><a class="btn btn-outline-secondary" href="https://www.instagram.com/gaizkawisnu/"><i class="fa-brands fa-instagram "></i></a></li>
+              <li class="list-inline-item"><a class="btn btn-outline-secondary" href="#"><i class="fa-brands fa-twitter"></i></a></li>
+              <li class="list-inline-item"><a class="btn btn-outline-secondary" href="https://www.linkedin.com/in/waskitho-adiwiguno-736a05271/"><i class="fa-brands fa-linkedin-in"></i></a></li>
+              <li class="list-inline-item"><a class="btn btn-outline-secondary" href="https://github.com/itungin"><i class="fa-brands fa-github"></i></a></li>
+            </ul>
+          </div>
+          <div class="col-md-6 col-sm-12"><span class="text-secondary pt-1 float-md-end float-sm-start">Copyright &copy; 2024</span></div>
         </div>
-        <div class="form-group buttons">
-          <button type="reset" class="btn-reset">Reset</button>
-          <button type="button" id="save-btn" class="btn-submit">Simpan</button>
-        </div>
-      </form>
-      <section>
-        
-        <h2>Data Pesanan</h2>
-        <div class="order-list"></div>
+      </div>
+    </div>
+  </footer>
 
-        <table id="order-table">
-          <thead>
-            <tr>
-              <th>Nama Pelanggan</th>
-              <th>Nomor Telepon</th>
-              <th>Jenis Layanan</th>
-              <th>Berat (KG)</th>
-              <th>Total Harga</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-    </main>
-    <script src="src/js/app.js" type="module"></script>
-  </body>
+  <div id="loading" class="loading-screen">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Script untuk Toggle Sidebar dan Scroll Effect -->
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
+    }
+    
+    window.onscroll = function() {
+      const header = document.getElementById("main-header");
+      if (window.scrollY > 50) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    };
+    // Loading screen
+    window.addEventListener('load', () => {
+      document.getElementById('loading').style.display = 'none';
+    });
+
+    // dark mode
+    const toggle = document.getElementById('darkModeToggle');
+    const icon = document.getElementById('darkModeIcon');
+    const body = document.body;
+
+    // Cek jika pengguna pernah menyimpan preferensi dark mode
+    if (localStorage.getItem('dark-mode') === 'enabled') {
+      body.classList.add('dark-mode');
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    }
+
+    toggle.addEventListener('click', () => {
+      if (body.classList.contains('dark-mode')) {
+        body.classList.remove('dark-mode');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        localStorage.setItem('dark-mode', 'disabled');
+      } else {
+        body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        localStorage.setItem('dark-mode', 'enabled');
+      }
+    });
+
+  </script>
+</body>
 </html>

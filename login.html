@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="src/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="email" name="email" placeholder="E-Mail" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <button id="login-btn">Login</button>
+            <button id="back-btn" class="link-style">Back to main menu</button>
+            <div class="forgot-password">
+                <!-- Google Login Button -->
+                <div id="g_id_onload" 
+                     data-client_id="861139910885-5flb4pjosqce4ecldalgqkuj66kf2eru.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large">
+            </div>
+            <div class="whats-auth">
+                <a href="https://itung.in.my.id/login/">Use Whatsauth</a>
+            </div>
+            </div>
+            <div class="forgot-password">
+                <a href="Register.html">Don't have an account?</a>
+            </div>
+            <div class="forgot-password">
+                <a href="Forgot_password.html">Forgot your password?</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="src/js/login.js"></script>
+    <!-- <script>
+        // Ganti "YOUR_CLIENT_ID" dengan Client ID dari Google OAuth Anda.
+        const CLIENT_ID = "861139910885-5flb4pjosqce4ecldalgqkuj66kf2eru.apps.googleusercontent.com";
+
+        // Callback function setelah pengguna berhasil login
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            // Decode token menggunakan library atau kirim ke backend untuk verifikasi
+            alert("Login berhasil! ID Token diterima.");
+            // Redirect ke halaman utama atau dashboard
+            window.location.href = "https://itung.in.my.id/dashboard/"; // Sesuaikan halaman redirect
+        }
+    </script> -->
+    <script>
+        // Ganti "YOUR_CLIENT_ID" dengan Client ID dari Google OAuth Anda.
+        const CLIENT_ID = "861139910885-5flb4pjosqce4ecldalgqkuj66kf2eru.apps.googleusercontent.com";
+    
+        // Callback function setelah pengguna berhasil login
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+    
+            // Set JWT ID token ke dalam cookies dengan nama 'login'
+            document.cookie = `login=${response.credential}; path=/; Secure; SameSite=Strict;`;
+    
+            alert("Login berhasil! ID Token diterima.");
+            
+            // Redirect ke halaman utama atau dashboard
+            window.location.href = "https://itung.in.my.id/dashboard/"; // Sesuaikan halaman redirect
+        }
+    </script>
+    
+
+</body>
+
+</html>
