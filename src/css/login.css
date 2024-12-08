@@ -7,7 +7,7 @@
 
 body {
     display: flex;
-    background-image: url('src/img/bg.webp'); /* Background image */
+    background-image: url('/src/img/bg.webp'); /* Background image */
     background-size: cover;
     justify-content: center;
     align-items: center;
