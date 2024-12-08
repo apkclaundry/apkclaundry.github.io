@@ -1,5 +1,5 @@
 import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
-import {addCSS} from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
+import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
 
 addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 
@@ -21,11 +21,9 @@ document.getElementById('calculate-btn').addEventListener('click', function () {
     return;
   }
 
-  // Ambil harga per kg berdasarkan jenis layanan
   const pricePerKg = servicePrices[serviceType];
   const totalPrice = Math.ceil(weight * pricePerKg);
 
-  // Tampilkan total harga
   document.getElementById('total-price').value = `Rp${totalPrice.toLocaleString('id-ID')}`;
 });
 
@@ -42,16 +40,19 @@ document.getElementById('save-btn').addEventListener('click', function () {
     return;
   }
 
-  const order = { name, phone, service, weight, totalPrice };
+  // Tambahkan tanggal saat ini
+  const date = new Date().toLocaleString('id-ID', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+
+  const order = { name, phone, service, weight, totalPrice, date, isPaid: false };
 
   let orders = JSON.parse(localStorage.getItem('orders')) || [];
   orders.push(order);
   localStorage.setItem('orders', JSON.stringify(orders));
 
-  // Tampilkan data terbaru
   displayOrders();
-
-  // Reset form
   document.getElementById('order-form').reset();
   document.getElementById('total-price').value = '';
 
@@ -61,125 +62,132 @@ document.getElementById('save-btn').addEventListener('click', function () {
 function displayOrders() {
   const orders = JSON.parse(localStorage.getItem('orders')) || [];
   const tableBody = document.querySelector('#order-table tbody');
-  const orderList = document.querySelector('.order-list');
 
   tableBody.innerHTML = '';
-  orderList.innerHTML = '';
 
   orders.forEach((order, index) => {
-    // Tambahkan data ke tabel
+    const paymentStatus = order.isPaid ? 'Paid' : 'Not Paid';
+    const paymentColor = order.isPaid ? 'green' : 'red';
+
     const row = document.createElement('tr');
+    row.dataset.index = index; // Simpan index sebagai data atribut
     row.innerHTML = `
       <td>${order.name}</td>
       <td>${order.phone}</td>
       <td>${order.service}</td>
       <td>${order.weight}</td>
       <td>${order.totalPrice}</td>
+      <td>${order.date}</td>
+      <td style="color: ${paymentColor}; font-weight: bold;">${paymentStatus}</td>
       <td>
-        <button class="edit" onclick="editOrder(${index})" title="Edit">
-          <i class="fa fa-pencil-alt"></i>
-        </button>
-        <button class="delete" onclick="deleteOrder(${index})" title="Delete">
-          <i class="fa fa-trash-alt"></i>
-        </button>
+        <button class="payment">Payment</button>
+        <button class="edit" title="Edit"><i class="fa fa-pencil-alt"></i></button>
+        <button class="delete" title="Delete"><i class="fa fa-trash-alt"></i></button>
       </td>
     `;
     tableBody.appendChild(row);
-
-    // Tambahkan data ke list
-    const listItem = document.createElement('div');
-    listItem.classList.add('order-item');
-    listItem.innerHTML = `
-      <p><strong>Nama Pelanggan:</strong> ${order.name}</p>
-      <p><strong>Nomor Telepon:</strong> ${order.phone}</p>
-      <p><strong>Jenis Layanan:</strong> ${order.service}</p>
-      <p><strong>Berat (KG):</strong> ${order.weight}</p>
-      <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
-      <div class="actions">
-        <button class="edit" onclick="editOrder(${index})" title="Edit">
-          <i class="fa fa-pencil-alt"></i>
-        </button>
-        <button class="delete" onclick="deleteOrder(${index})" title="Delete">
-          <i class="fa fa-trash-alt"></i>
-        </button>
-      </div>
-    `;
-    orderList.appendChild(listItem);
   });
 }
 
+// Event delegation untuk tombol Payment, Edit, dan Delete
+document.querySelector('#order-table tbody').addEventListener('click', function (event) {
+  const target = event.target;
+  const row = target.closest('tr');
+  const index = parseInt(row.dataset.index, 10);
+
+  if (target.classList.contains('payment')) {
+    processPayment(index);
+  } else if (target.classList.contains('edit') || target.closest('.edit')) {
+    editOrder(index);
+  } else if (target.classList.contains('delete') || target.closest('.delete')) {
+    deleteOrder(index);
+  }
+});
+
+function processPayment(index) {
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
+  orders[index].isPaid = true;
+  localStorage.setItem('orders', JSON.stringify(orders));
+  displayOrders();
+  Swal.fire('Berhasil!', 'Pembayaran berhasil diproses.', 'success');
+}
 
 function editOrder(index) {
   const orders = JSON.parse(localStorage.getItem('orders')) || [];
   const order = orders[index];
 
+  // Menyiapkan konten form di dalam SweetAlert2 popup
+  const content = `
+    <label for="edit-name">Nama Pelanggan:</label>
+    <input type="text" id="edit-name" class="swal2-input" value="${order.name}" required>
+
+    <label for="edit-phone">Nomor Telepon:</label>
+    <input type="text" id="edit-phone" class="swal2-input" value="${order.phone}" required>
+
+    <label for="edit-service">Jenis Layanan:</label>
+    <select id="edit-service" class="swal2-input" required>
+      <option value="cuci-setrika" ${order.service === 'cuci-setrika' ? 'selected' : ''}>Cuci & Setrika</option>
+      <option value="cuci" ${order.service === 'cuci' ? 'selected' : ''}>Cuci</option>
+      <option value="setrika" ${order.service === 'setrika' ? 'selected' : ''}>Setrika</option>
+    </select>
+
+    <label for="edit-weight">Berat (KG):</label>
+    <input type="number" id="edit-weight" class="swal2-input" value="${order.weight}" required>
+
+    <label for="edit-total-price">Total Harga:</label>
+    <input type="text" id="edit-total-price" class="swal2-input" value="${order.totalPrice}" readonly>
+  `;
+
+  // Menampilkan SweetAlert2 popup
   Swal.fire({
     title: 'Edit Pesanan',
-    html: `
-      <label for="edit-name">Nama Pelanggan:</label>
-      <input type="text" id="edit-name" class="swal2-input" value="${order.name}" required>
-      <label for="edit-phone">Nomor Telepon:</label>
-      <input type="tel" id="edit-phone" class="swal2-input" value="${order.phone}" required>
-      <label for="edit-service">Jenis Layanan:</label>
-      <select id="edit-service" class="swal2-select">
-        <option value="cuci-setrika" ${order.service === 'cuci-setrika' ? 'selected' : ''}>Cuci & Setrika</option>
-        <option value="cuci" ${order.service === 'cuci' ? 'selected' : ''}>Cuci</option>
-        <option value="setrika" ${order.service === 'setrika' ? 'selected' : ''}>Setrika</option>
-      </select>
-      <label for="edit-weight">Berat (KG):</label>
-      <input type="number" id="edit-weight" class="swal2-input" value="${order.weight}" required>
-    `,
-    focusConfirm: false,
+    html: content,
     showCancelButton: true,
-    confirmButtonText: 'Simpan',
+    confirmButtonText: 'Simpan Perubahan',
+    cancelButtonText: 'Batal',
     preConfirm: () => {
-      const updatedOrder = {
-        name: document.getElementById('edit-name').value,
-        phone: document.getElementById('edit-phone').value,
-        service: document.getElementById('edit-service').value,
-        weight: document.getElementById('edit-weight').value,
-        totalPrice: `Rp${Math.ceil(document.getElementById('edit-weight').value * servicePrices[document.getElementById('edit-service').value]).toLocaleString('id-ID')}`,
-      };
+      const updatedName = document.getElementById('edit-name').value;
+      const updatedPhone = document.getElementById('edit-phone').value;
+      const updatedService = document.getElementById('edit-service').value;
+      const updatedWeight = parseFloat(document.getElementById('edit-weight').value);
 
-      if (!updatedOrder.name || !updatedOrder.phone || !updatedOrder.service || !updatedOrder.weight) {
-        Swal.showValidationMessage('Harap isi semua data!');
+      if (!updatedName || !updatedPhone || !updatedService || isNaN(updatedWeight) || updatedWeight <= 0) {
+        Swal.showValidationMessage('Harap isi semua data dengan benar!');
         return false;
       }
+
+      const updatedOrder = {
+        name: updatedName,
+        phone: updatedPhone,
+        service: updatedService,
+        weight: updatedWeight,
+        totalPrice: `Rp${(updatedWeight * servicePrices[updatedService]).toLocaleString('id-ID')}`,
+        date: order.date, // Tanggal tetap sama
+        isPaid: order.isPaid, // Status pembayaran tetap sama
+      };
+
+      // Perbarui data pada indeks yang sesuai
+      orders[index] = updatedOrder;
+      localStorage.setItem('orders', JSON.stringify(orders));
+      displayOrders(); // Tampilkan kembali daftar pesanan
 
       return updatedOrder;
     }
   }).then((result) => {
     if (result.isConfirmed) {
-      orders[index] = result.value;
-      localStorage.setItem('orders', JSON.stringify(orders));
-      displayOrders();
       Swal.fire('Berhasil!', 'Pesanan berhasil diperbarui.', 'success');
     }
   });
 }
-window.editOrder = editOrder;
+
+
 
 function deleteOrder(index) {
-  Swal.fire({
-    title: 'Hapus Pesanan?',
-    text: "Data ini tidak dapat dipulihkan setelah dihapus!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Ya, Hapus!',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      orders.splice(index, 1);
-      localStorage.setItem('orders', JSON.stringify(orders));
-      displayOrders();
-      Swal.fire('Dihapus!', 'Pesanan telah dihapus.', 'success');
-    }
-  });
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
+  orders.splice(index, 1);
+  localStorage.setItem('orders', JSON.stringify(orders));
+  displayOrders();
+  Swal.fire('Berhasil!', 'Pesanan berhasil dihapus.', 'success');
 }
-window.deleteOrder = deleteOrder;
 
-
-// Panggil fungsi untuk menampilkan data saat halaman dimuat
 document.addEventListener('DOMContentLoaded', displayOrders);
-

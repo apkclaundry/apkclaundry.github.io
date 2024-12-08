@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Laundry POS - Input Pesanan</title>
     <link rel="stylesheet" href="src/css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
   </head>
   <body>
     <header>
       <div class="header-container">
         <div class="logo">
-          <img src="src/img/logo.png" alt="Logo Laundry POS">
+          <img src="src/img/logo.png" alt="Logo Laundry POS" />
           <h1>Laundry POS</h1>
         </div>
         <nav>
@@ -86,11 +88,11 @@
         </div>
       </form>
       <section>
-        
         <h2>Data Pesanan</h2>
         <div class="order-list"></div>
 
         <table id="order-table">
+          <!-- Tambahkan Kolom Payment Status -->
           <thead>
             <tr>
               <th>Nama Pelanggan</th>
@@ -98,6 +100,8 @@
               <th>Jenis Layanan</th>
               <th>Berat (KG)</th>
               <th>Total Harga</th>
+              <th>Tanggal Transaksi</th>
+              <th>Payment Status</th>
               <th>Aksi</th>
             </tr>
           </thead>
