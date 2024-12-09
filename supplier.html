@@ -1,0 +1,135 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laundry POS - Data Supplier</title>
+    <link rel="stylesheet" href="src/css/supplier.css" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    </head>
+    <body>
+    <header>
+        <div class="header-container">
+        <div class="logo">    
+            <img src="src/img/logo.png" alt="Logo Laundry POS" />
+            <h1>Laundry POS</h1>
+        </div>
+        <nav>
+            <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="supplier.html">Supplier</a></li>
+            <li><a href="stock.html">Stock</a></li>
+            <li><a href="laporan.html">Laporan</a></li>
+            </ul>
+            <button class="burger" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+        </div>
+    </header>
+    <main>
+        <!-- Formulir Data Supplier -->
+        <form id="supplier-form">
+        <div class="form-group">
+            <label for="supplier-id">ID Supplier</label>
+            <input
+            type="text"
+            id="supplier-id"
+            name="supplier_id"
+            placeholder="ID unik supplier"
+            required
+            />
+        </div>
+        <div class="form-group">
+            <label for="supplier-name">Nama Supplier</label>
+            <input
+            type="text"
+            id="supplier-name"
+            name="supplier_name"
+            placeholder="Masukkan nama supplier"
+            required
+            />
+        </div>
+        <div class="form-group">
+            <label for="supplier-phone">Nomor Telepon</label>
+            <input
+            type="tel"
+            id="supplier-phone"
+            name="supplier_phone"
+            placeholder="08xxxxxxxxxx"
+            pattern="[0-9]{10,13}"
+            title="Masukkan nomor telepon yang valid (10-13 digit angka)"
+            required
+            />
+        </div>
+        <div class="form-group">
+            <label for="supplier-address">Alamat</label>
+            <input
+            type="text"
+            id="supplier-address"
+            name="supplier_address"
+            placeholder="Masukkan alamat supplier"
+            required
+            />
+        </div>
+        <div class="form-group">
+            <label for="supplier-email">Email</label>
+            <input
+            type="email"
+            id="supplier-email"
+            name="supplier_email"
+            placeholder="Masukkan email supplier"
+            required
+            />
+        </div>
+        <div class="form-group">
+            <label for="supplier-products">Produk yang Disuplai</label>
+            <textarea
+            id="supplier-products"
+            name="supplier_products"
+            placeholder="Masukkan produk yang disuplai (pisahkan dengan koma)"
+            required
+            ></textarea>
+        </div>
+        <div class="form-group buttons">
+            <button type="reset" class="btn-reset">Reset</button>
+            <button type="button" id="save-btn" class="btn-submit">Simpan</button>
+        </div>
+        </form>
+        <section>
+            <h2>Data Supplier</h2>
+            <div class="supplier-list"></div>
+          
+            <div class="table-responsive">
+              <table id="supplier-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Nomor Telepon</th>
+                    <th>Alamat</th>
+                    <th>Email</th>
+                    <th>Produk yang Disuplai</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+          
+    </main>
+    <script src="src/js/supplier.js" type="module"></script>
+    <script>
+        // Toggle menu visibility
+        document.querySelector(".burger").addEventListener("click", () => {
+        const navLinks = document.querySelector(".nav-links");
+        navLinks.classList.toggle("active");
+        });
+    </script>
+    </body>
+    </html>
