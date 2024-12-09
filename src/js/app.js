@@ -109,9 +109,9 @@ function displayOrders() {
       <p><strong>Berat (KG):</strong> ${order.weight}</p>
       <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
       <p><strong>Tanggal:</strong> ${order.date}</p>
-      <p><strong>Payment Status:</strong> ${paymentStatus}</p>
+      <p style="color: ${paymentColor}; font-weight: bold;" ><strong>Payment Status:</strong > ${paymentStatus}</p>
       <div class="actions">
-        <button class="payment" onclick="paymentStatus(${index})">payment</button>
+        <button onclick="window.location.href='transaksi.html?id=${order.id}'">Payment</button>
         <button class="edit" onclick="editOrder(${index})">Edit</button>
         <button class="delete" onclick="deleteOrder(${index})">Delete</button>
       </div>
