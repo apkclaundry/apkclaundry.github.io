@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaksi - Laundry POS</title>
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <h1>Halaman Transaksi</h1>
+    </div>
+  </header>
+  <main>
+    <section id="order-detail">
+      <h2>Detail Pesanan</h2>
+      <p><strong>Nama Pelanggan:</strong> <span id="trans-name"></span></p>
+      <p><strong>Nomor Telepon:</strong> <span id="trans-phone"></span></p>
+      <p><strong>Jenis Layanan:</strong> <span id="trans-service"></span></p>
+      <p><strong>Berat (KG):</strong> <span id="trans-weight"></span></p>
+      <p><strong>Total Harga:</strong> <span id="trans-total"></span></p>
+    </section>
+
+    <section id="payment-method">
+      <h2>Pilih Metode Pembayaran</h2>
+      <select id="payment-method-select" required>
+        <option value="cash">Cash</option>
+        <option value="transfer">Transfer</option>
+        <option value="e-wallet">E-Wallet</option>
+      </select>
+    </section>
+
+    <button id="confirm-payment" class="btn-confirm">Konfirmasi Pembayaran</button>
+  </main>
+
+  <script src="src/js/transaksi.js" type="module"></script>
+</body>
+</html>

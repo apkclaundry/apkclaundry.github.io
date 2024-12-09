@@ -1,0 +1,277 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  
+  header {
+    background-color: #666666;
+    color: white;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .logo h1 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  main {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1,
+  h2 {
+    margin: 0;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .nav-links li a:hover {
+    text-decoration: underline;
+  }
+  .burger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  /* Container & Form Styling */
+  .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .title, .subtitle {
+      text-align: center;
+      color: #2c3e50;
+    }
+    
+    .title {
+      font-size: 2em;
+      color: #3498db;
+    }
+    
+    .subtitle {
+      font-size: 1.5em;
+      color: #2ecc71;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input, select, .btn-save {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    select {
+      background-color: #fff;
+    }
+    
+    .btn-save {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-save:hover {
+      background-color: #27ae60;
+    }
+    
+    /* Table Styling */
+    #transaction-table {
+      width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #fff; /* Update */
+    border-radius: 10px; /* Update */
+    overflow: hidden; /* Update */
+    }
+    
+    #transaction-table th, #transaction-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    
+    #transaction-table th {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    #transaction-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    
+    #transaction-table tr:hover {
+      background-color: #f1c40f;
+    }
+  
+   /* Styling untuk tombol aksi */
+  .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Jarak antar tombol */
+    }
+    
+    .actions button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; /* Ukuran tombol seragam */
+      height: 36px;
+      border: none;
+      border-radius: 50%; /* Membuat tombol menjadi bulat */
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    /* Tombol hapus */
+    .actions .delete {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .actions .delete:hover {
+      background-color: #c0392b;
+    }
+    
+    /* Tombol edit */
+    .actions .edit {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .actions .edit:hover {
+      background-color: #2980b9;
+    }
+    
+    /* Tambahkan shadow pada tombol */
+    .actions button {
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .actions button:hover {
+      transform: scale(1.1); /* Animasi hover */
+    }
+    .hidden {
+      display: none;
+    }
+    
+    /* Responsivitas untuk tabel */
+  @media (max-width: 768px) {
+    #transaction-table thead {
+      display: none; /* Sembunyikan header tabel */
+    }
+  
+    #transaction-table tbody, #transaction-table tr {
+      display: block;
+      width: 100%;
+    }
+  
+    #transaction-table td {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    #transaction-table td::before {
+      content: attr(data-label); /* Ambil label dari data-label */
+      font-weight: bold;
+      text-transform: capitalize;
+      color: #2c3e50;
+      margin-right: 10px;
+    }
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      background-color: #4CAF50;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 100%;
+      text-align: center;
+    }
+  
+    .nav-links.active {
+      display: flex;
+    }
+  
+    .burger {
+      display: block;
+    }
+    #order-table {
+      display: none;
+    }
+    .order-list {
+      display: block;
+    }
+  }
+  
+    
+  
+  
+  
+  

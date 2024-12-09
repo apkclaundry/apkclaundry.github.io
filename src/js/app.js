@@ -46,7 +46,16 @@ document.getElementById('save-btn').addEventListener('click', function () {
     timeStyle: 'short',
   });
 
-  const order = { name, phone, service, weight, totalPrice, date, isPaid: false };
+  const order = { 
+    id: Date.now(),  // Menambahkan ID unik menggunakan timestamp
+    name, 
+    phone, 
+    service, 
+    weight, 
+    totalPrice, 
+    date, 
+    isPaid: false 
+  };
 
   let orders = JSON.parse(localStorage.getItem('orders')) || [];
   orders.push(order);
@@ -59,57 +68,57 @@ document.getElementById('save-btn').addEventListener('click', function () {
   Swal.fire('Berhasil!', 'Pesanan berhasil disimpan.', 'success');
 });
 
-  function displayOrders() {
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    const tableBody = document.querySelector('#order-table tbody');
-    const orderList = document.querySelector('.order-list');
 
-    tableBody.innerHTML = '';
-    orderList.innerHTML = '';
+function displayOrders() {
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
+  const tableBody = document.querySelector('#order-table tbody');
+  const orderList = document.querySelector('.order-list');
 
-    orders.forEach((order, index) => {
-      const paymentStatus = order.isPaid ? 'Paid' : 'Not Paid';
-      const paymentColor = order.isPaid ? 'green' : 'red';
+  tableBody.innerHTML = '';
+  orderList.innerHTML = '';
 
-      const row = document.createElement('tr');
-      row.dataset.index = index; // Simpan index sebagai data atribut
-      row.innerHTML = `
-        <td>${order.name}</td>
-        <td>${order.phone}</td>
-        <td>${order.service}</td>
-        <td>${order.weight}</td>
-        <td>${order.totalPrice}</td>
-        <td>${order.date}</td>
-        <td style="color: ${paymentColor}; font-weight: bold;">${paymentStatus}</td>
-        <td>
-          <button class="payment">Payment</button>
-          <button class="edit" title="Edit"><i class="fa fa-pencil-alt"></i></button>
-          <button class="delete" title="Delete"><i class="fa fa-trash-alt"></i></button>
-        </td>
-      `;
-      tableBody.appendChild(row);
+  orders.forEach((order, index) => {
+    const paymentStatus = order.isPaid ? 'Paid' : 'Not Paid';
+    const paymentColor = order.isPaid ? 'green' : 'red';
 
-          // Tambahkan data ke list versi mobile
-          const listItem = document.createElement('div');
-          listItem.classList.add('order-item');
-          listItem.innerHTML = `
-            <p><strong>Nama Pelanggan:</strong> ${order.name}</p>
-            <p><strong>Nomor Telepon:</strong> ${order.phone}</p>
-            <p><strong>Jenis Layanan:</strong> ${order.service}</p>
-            <p><strong>Berat (KG):</strong> ${order.weight}</p>
-            <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
-            <p><strong>Tanggal:</strong> ${order.date}</p>
-            <p><strong>Payment Status:</strong> ${paymentStatus}</p>
-            <div class="actions">
-              <button class="payment" onclick="paymentStatus(${index})">payment</button>
-              <button class="edit" onclick="editOrder(${index})">Edit</button>
-              <button class="delete" onclick="deleteOrder(${index})">Delete</button>
-            </div>
-          `;
-          orderList.appendChild(listItem);
-        });
-      }
+    const row = document.createElement('tr');
+    row.dataset.index = index; // Simpan index sebagai data atribut
+    row.innerHTML = `
+      <td>${order.name}</td>
+      <td>${order.phone}</td>
+      <td>${order.service}</td>
+      <td>${order.weight}</td>
+      <td>${order.totalPrice}</td>
+      <td>${order.date}</td>
+      <td style="color: ${paymentColor}; font-weight: bold;">${paymentStatus}</td>
+      <td>
+        <button onclick="window.location.href='transaksi.html?id=${order.id}'">Payment</button>
+        <button class="edit" title="Edit"><i class="fa fa-pencil-alt"></i></button>
+        <button class="delete" title="Delete"><i class="fa fa-trash-alt"></i></button>
+      </td>
+    `;
+    tableBody.appendChild(row);
 
+    // Tambahkan data ke list versi mobile
+    const listItem = document.createElement('div');
+    listItem.classList.add('order-item');
+    listItem.innerHTML = `
+      <p><strong>Nama Pelanggan:</strong> ${order.name}</p>
+      <p><strong>Nomor Telepon:</strong> ${order.phone}</p>
+      <p><strong>Jenis Layanan:</strong> ${order.service}</p>
+      <p><strong>Berat (KG):</strong> ${order.weight}</p>
+      <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
+      <p><strong>Tanggal:</strong> ${order.date}</p>
+      <p><strong>Payment Status:</strong> ${paymentStatus}</p>
+      <div class="actions">
+        <button class="payment" onclick="paymentStatus(${index})">payment</button>
+        <button class="edit" onclick="editOrder(${index})">Edit</button>
+        <button class="delete" onclick="deleteOrder(${index})">Delete</button>
+      </div>
+    `;
+    orderList.appendChild(listItem);
+  });
+}
 
 // Event delegation untuk tombol Payment, Edit, dan Delete
 document.querySelector('#order-table tbody').addEventListener('click', function (event) {
@@ -213,3 +222,8 @@ function deleteOrder(index) {
 }
 
 document.addEventListener('DOMContentLoaded', displayOrders);
+// Ambil ID dari query parameter
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('id');
+
+// Gunakan orderId untuk menampilkan detail transaksi berdasarkan ID pesanan
