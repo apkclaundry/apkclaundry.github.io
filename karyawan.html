@@ -84,5 +84,12 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.js"></script>
     <script src="src/js/karyawan.js" type="module"></script>
+    <script>
+      // Toggle menu visibility
+      document.querySelector(".burger").addEventListener("click", () => {
+        const navLinks = document.querySelector(".nav-links");
+        navLinks.classList.toggle("active");
+      });
+    </script>
   </body>
 </html>
