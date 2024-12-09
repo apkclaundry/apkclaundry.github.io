@@ -86,8 +86,26 @@ function displayOrders() {
       </td>
     `;
     tableBody.appendChild(row);
-  });
-}
+
+        // Tambahkan data ke list
+        const listItem = document.createElement('div');
+        listItem.classList.add('order-item');
+        listItem.innerHTML = `
+          <p><strong>Nama Pelanggan:</strong> ${order.name}</p>
+          <p><strong>Nomor Telepon:</strong> ${order.phone}</p>
+          <p><strong>Jenis Layanan:</strong> ${order.service}</p>
+          <p><strong>Berat (KG):</strong> ${order.weight}</p>
+          <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
+          <p><strong>Tanggal:</strong> ${order.date}</p>
+          <div class="actions">
+            <button class="edit" onclick="editOrder(${index})">Edit</button>
+            <button class="delete" onclick="deleteOrder(${index})">Delete</button>
+          </div>
+        `;
+        orderList.appendChild(listItem);
+      });
+    }
+
 
 // Event delegation untuk tombol Payment, Edit, dan Delete
 document.querySelector('#order-table tbody').addEventListener('click', function (event) {
