@@ -283,6 +283,66 @@ table#order-table td {
   text-align: left;
 }
 
+/* Default styles */
+/* .header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #6c6c6c;
+} */
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links li {
+  margin: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Mobile styles */
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.burger i {
+  color: #333;
+}
+
+/* Hide nav-links on mobile by default */
+/* .nav-links {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  z-index: 10;
+}  */
+
+.nav-links.active {
+  display: flex;
+  background-color: rgba(128, 128, 128, 0.9); /* Abu-abu semi-transparan lebih pekat */
+  border: 1px solid rgba(0, 0, 0, 0.2); /* Batas tipis semi-transparan */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
 /* Responsif: Ubah tabel menjadi tampilan list pada layar kecil */
 @media screen and (max-width: 768px) {
   .nav-links {

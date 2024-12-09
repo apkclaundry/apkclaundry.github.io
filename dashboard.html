@@ -21,10 +21,10 @@
           <ul class="nav-links">
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="karyawan.html">Karyawan</a></li>
-            <li><a href="stock.html">stock</a></li>
+            <li><a href="stock.html">Stock</a></li>
             <li><a href="laporan.html">Laporan</a></li>
           </ul>
-          <button class="burger">
+          <button class="burger" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
           </button>
         </nav>
@@ -106,8 +106,15 @@
           </thead>
           <tbody></tbody>
         </table>
-      </section>  
+      </section>
     </main>
     <script src="src/js/app.js" type="module"></script>
+    <script>
+      // Toggle menu visibility
+      document.querySelector(".burger").addEventListener("click", () => {
+        const navLinks = document.querySelector(".nav-links");
+        navLinks.classList.toggle("active");
+      });
+    </script>
   </body>
 </html>
