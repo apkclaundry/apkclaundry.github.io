@@ -284,45 +284,30 @@ table#order-table td {
 }
 
 /* Responsif: Ubah tabel menjadi tampilan list pada layar kecil */
-@media (max-width: 768px) {
-  table#order-table {
-    display: block;
-    border: none;
-  }
-
-  table#order-table thead {
-    display: none; /* Sembunyikan header tabel */
-  }
-
-  table#order-table tbody {
-    display: block;
-  }
-
-  table#order-table tr {
-    display: block;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background: #f9f9f9;
-  }
-
-  table#order-table td {
-    display: block;
-    padding: 5px 0;
-    position: relative;
-  }
-
-  table#order-table td::before {
-    content: attr(data-label); /* Gunakan atribut data-label untuk setiap kolom */
+@media screen and (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: #4CAF50;
     position: absolute;
-    left: 10px;
-    font-weight: bold;
-    color: #555;
-    text-transform: capitalize;
+    top: 60px;
+    right: 0;
+    width: 100%;
+    text-align: center;
   }
 
-  table#order-table td:last-child {
-    padding-bottom: 10px; /* Jarak tambahan untuk kolom terakhir */
+  .nav-links.active {
+    display: flex;
+  }
+
+  .burger {
+    display: block;
+  }
+  #order-table {
+    display: none;
+  }
+  .order-list {
+    display: block;
   }
 }
+

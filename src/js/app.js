@@ -62,8 +62,10 @@ document.getElementById('save-btn').addEventListener('click', function () {
 function displayOrders() {
   const orders = JSON.parse(localStorage.getItem('orders')) || [];
   const tableBody = document.querySelector('#order-table tbody');
+  const orderList = document.querySelector('.order-list');
 
   tableBody.innerHTML = '';
+  orderList.innerHTML = '';
 
   orders.forEach((order, index) => {
     const paymentStatus = order.isPaid ? 'Paid' : 'Not Paid';
