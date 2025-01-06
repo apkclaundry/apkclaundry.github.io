@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    background-image: url('/src/img/bg.webp'); /* Background image */
+    background-size: cover;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* background: linear-gradient(135deg, #ffffff, #4c52ce); */
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 40px;
+    width: 350px;
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"],
+.login-container input[type="email"],
+.login-container input[type="name"],
+.login-container input[type="umkm-name"]
+{
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.5);
+    color: white;
+    font-size: 1em;
+    outline: none;
+    transition: background 0.3s ease;
+}
+
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.login-container button {
+    width: 100%;
+    padding: 15px;
+    background-color: #ff416c;
+    background-image: linear-gradient(135deg, #ff4b2b, #ff416c);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.login-container button:hover {
+    transform: scale(1.05);
+    background-image: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.login-container .forgot-password {
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.login-container .whats-auth {
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.login-container .whats-auth a {
+    color: #41ff74;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-container .forgot-password a {
+    color: #ff416c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-container .whats-auth a:hover {
+    color: #2bffff;
+}
+
+.login-container .forgot-password a:hover {
+    color: #ff4b2b;
+}
+
+.link-style {
+    color: #333;
+    /* Sesuaikan warna teks */
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}

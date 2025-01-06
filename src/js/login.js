@@ -1,62 +1,47 @@
-// Pastikan script dijalankan setelah DOM dimuat sepenuhnya
-document.addEventListener('DOMContentLoaded', function () {
-    // Event listener untuk tombol login
-    const loginBtn = document.getElementById('login-btn');
-    const backBtn = document.getElementById('back-btn');
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Prevent the default form submission behavior
 
-    if (loginBtn) {
-        loginBtn.addEventListener('click', async function () {
-            // Mengambil nilai dari input email dan password
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    // Capture the values from the form
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-            // Validasi input
-            if (!email || !password) {
-                alert('Email dan password harus diisi!');
-                return;
-            }
+    // Create an object to hold the login credentials
+    const credentials = {
+        username: username,
+        password: password
+    };
 
-            // Membuat objek kredensial
-            const credentials = {
-                email: email,
-                password: password
-            };
-
-            try {
-                // Mengirim permintaan POST ke endpoint login backend
-                const response = await fetch('https://apkclaundry.vercel.app/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(credentials)
-                });
-
-                if (response.ok) {
-                    // Jika login berhasil, simpan token dan redirect
-                    const result = await response.json();
-                    localStorage.setItem('authToken', result.token);
-                    alert('Login berhasil!');
-
-                    // Redirect ke halaman dashboard
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // Jika login gagal, tampilkan pesan kesalahan
-                    const error = await response.json();
-                    alert('Login gagal: ' + error.message);
-                }
-            } catch (err) {
-                // Jika terjadi kesalahan jaringan atau lainnya
-                alert('Terjadi kesalahan: ' + err.message);
-            }
+    try {
+        // Send a POST request to your backend login endpoint
+        const response = await fetch('https://apkclaundry.vercel.app/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials) // Send the credentials in the request body
         });
-    }
 
-    // Event listener untuk tombol kembali ke menu utama
-    if (backBtn) {
-        backBtn.addEventListener('click', function (e) {
-            e.preventDefault(); // Mencegah perilaku default button
-            window.location.href = 'index.html'; // Redirect ke halaman utama
-        });
+        if (response.ok) {
+            // If login is successful, get the response (which might include a token)
+            const result = await response.json();
+
+            // Example: Save the token to localStorage (if your backend returns a JWT token)
+            localStorage.setItem('authToken', result.token);
+
+            // Redirect to the dashboard or home page after successful login
+            window.location.href = 'dashboard.html'; // You can change this to your desired page
+        } else {
+            // If the login failed, show an error message
+            const error = await response.json();
+            alert('Login failed: ' + error.message);
+        }
+    } catch (err) {
+        // If there's a network or other error, show an alert
+        alert('Error occurred: ' + err.message);
     }
+});
+
+document.getElementById('back-btn').addEventListener('click', function (e) {
+    e.preventDefault(); // Mencegah default button behavior
+    window.location.href = 'index.html'; // Redirect ke halaman LP.html
 });

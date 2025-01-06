@@ -1,117 +1,62 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
+.divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1px;
+background: #eee;
 }
+.h-custom {
+height: calc(100% - 73px);
+}
+@media (max-width: 450px) {
+.h-custom {
+height: 100%;
+}
+}   
 
-body {
-    display: flex;
-    background-image: url('/src/img/bg.webp'); /* Background image */
-    background-size: cover;
-    justify-content: center;
+.btn-back-dashboard {
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
-    height: 100vh;
-    /* background: linear-gradient(135deg, #ffffff, #4c52ce); */
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #007bff; /* Bootstrap primary color */
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+.btn-back-dashboard:hover {
+    color: #0056b3; /* Bootstrap primary hover color */
+    transform: translateX(-3px); /* Sedikit gerakan ke kiri */
+    text-decoration: underline;
+}
+.btn-back-dashboard i {
+    font-size: 1.2rem;
 }
 
-.login-container {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 40px;
-    width: 350px;
-    text-align: center;
-}
-
-.login-container h2 {
-    margin-bottom: 30px;
-    font-size: 2em;
-}
-
-.login-container input[type="text"],
-.login-container input[type="password"],
-.login-container input[type="email"],
-.login-container input[type="name"],
-.login-container input[type="umkm-name"]
-{
-    width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 25px;
-    background: rgba(255, 255, 255, 0.5);
-    color: white;
-    font-size: 1em;
-    outline: none;
-    transition: background 0.3s ease;
-}
-
-.login-container input[type="text"]:focus,
-.login-container input[type="password"]:focus {
-    background: rgba(255, 255, 255, 0.5);
-}
-
-.login-container button {
-    width: 100%;
-    padding: 15px;
-    background-color: #ff416c;
-    background-image: linear-gradient(135deg, #ff4b2b, #ff416c);
-    border: none;
-    border-radius: 25px;
-    color: white;
-    font-size: 1em;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.login-container button:hover {
-    transform: scale(1.05);
-    background-image: linear-gradient(135deg, #ff416c, #ff4b2b);
-}
-
-.login-container .forgot-password {
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-
-.login-container .whats-auth {
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-
-.login-container .whats-auth a {
-    color: #41ff74;
+.link-primary {
+    color: #007bff; /* Warna utama Bootstrap */
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: bold;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+.link-primary:hover {
+    color: #0056b3; /* Warna hover */
+    text-decoration: underline;
 }
 
-.login-container .forgot-password a {
-    color: #ff416c;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.login-container .whats-auth a:hover {
-    color: #2bffff;
-}
-
-.login-container .forgot-password a:hover {
-    color: #ff4b2b;
-}
-
-.link-style {
-    color: #333;
-    /* Sesuaikan warna teks */
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
+/* Tambahkan Efek Hover pada Tombol Register */
+.btn-primary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     border: none;
-    background: none;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Gambar */
+img.img-fluid {
+    max-width: 100%;
+    height: auto;
 }
