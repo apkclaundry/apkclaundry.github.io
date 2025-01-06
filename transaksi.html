@@ -5,6 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Transaksi - Laundry POS</title>
   <link rel="stylesheet" href="src/css/style.css">
+  <script type="module">
+    import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
+    import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
+  
+    addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
+  
+    // Fungsi untuk menyimpan token dari URL ke localStorage
+    function saveTokenFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("authToken");
+      if (token) {
+        localStorage.setItem("authToken", token);
+        console.log("Token berhasil disimpan ke localStorage:", token);
+      } 
+    }
+
+    // Fungsi untuk melakukan validasi localStorage
+    function validateLogin() {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        Swal.fire({
+          title: "Akses Ditolak",
+          text: "Silahkan login terlebih dahulu",
+          icon: "warning",
+          confirmButtonText: "Login",
+        }).then(() => {
+          // Redirect ke halaman login jika diperlukan
+          window.location.href = "https://apkclaundry.github.io/";
+        });
+      }
+    }
+
+    // Panggil fungsi untuk menyimpan token dan validasi saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+      saveTokenFromURL();
+      validateLogin();
+    });
+  </script>
 </head>
 <body>
   <header>
