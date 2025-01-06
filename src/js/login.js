@@ -1,48 +1,54 @@
-// import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
-import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
+// Event listener untuk form login
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Mencegah perilaku default form submission
 
-addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
+    // Mengambil nilai dari input username dan password
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-function showMessage(message, type) {
-    const messageBox = document.getElementById('message');
-    messageBox.textContent = message;
-    messageBox.className = `message ${type}`;
-    messageBox.style.display = 'block';
-
-    setTimeout(() => {
-        messageBox.style.display = 'none';
-    }, 3000);
-}
-
-function loginUser() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-
-    if (!email || !password) {
-        showMessage('Please fill in all fields!', 'error');
+    // Validasi input
+    if (!username || !password) {
+        alert('Username dan password harus diisi!');
         return;
     }
 
-    // Ambil data pengguna dari local storage
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+    // Membuat objek kredensial
+    const credentials = {
+        username: username,
+        password: password
+    };
 
-    // Cari pengguna berdasarkan email dan password
-    const user = users.find(u => u.email === email && u.password === password);
+    try {
+        // Mengirim permintaan POST ke endpoint login backend
+        const response = await fetch('https://apkclaundry.vercel.app/login  ', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials) // Mengirim kredensial dalam body request
+        });
 
-    if (user) {
-        showMessage('Login successful!', 'success');
-        // Redirect ke halaman utama atau dashboard
-        setTimeout(() => {
+        if (response.ok) {
+            // Jika login berhasil, simpan token dan redirect
+            const result = await response.json();
+            localStorage.setItem('authToken', result.token);
+            alert('Login berhasil!');
+
+            // Redirect ke halaman dashboard
             window.location.href = 'dashboard.html';
-        }, 2000);
-    } else {
-        showMessage('Invalid email or password!', 'error');
+        } else {
+            // Jika login gagal, tampilkan pesan kesalahan
+            const error = await response.json();
+            alert('Login gagal: ' + error.message);
+        }
+    } catch (err) {
+        // Jika terjadi kesalahan jaringan atau lainnya
+        alert('Terjadi kesalahan: ' + err.message);
     }
-}
+});
 
-window.loginUser = loginUser;
-
+// Event listener untuk tombol kembali ke menu utama
 document.getElementById('back-btn').addEventListener('click', function (e) {
-    e.preventDefault(); // Mencegah default button behavior
-    window.location.href = 'index.html'; // Redirect ke halaman LP.html
+    e.preventDefault(); // Mencegah perilaku default button
+    window.location.href = 'index.html'; // Redirect ke halaman utama
 });
