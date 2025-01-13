@@ -3,13 +3,32 @@ import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js
 
 addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 
+// Fungsi untuk mendapatkan token dari localStorage
+function getAuthToken() {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    Swal.fire({
+      title: "Error!",
+      text: "Token tidak ditemukan, silakan login kembali.",
+      icon: "error",
+      confirmButtonText: "Login",
+    }).then(() => {
+      window.location.href = "/login.html"; // Ganti dengan halaman login Anda
+    });
+    throw new Error("Token tidak ditemukan di localStorage.");
+  }
+  return token;
+}
+
 // Fungsi untuk menampilkan data karyawan
 async function fetchEmployees() {
+  const token = getAuthToken();
+
   try {
     const response = await fetch("https://apklaundry.vercel.app/employee", {
       method: "GET",
       headers: {
-        Authorization: `Bearer YOUR_TOKEN_HERE`, // Ganti dengan token Anda
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
@@ -79,11 +98,13 @@ function displayEmployees(employees) {
 
 // Fungsi untuk mengedit data karyawan
 async function editEmployee(id) {
+  const token = getAuthToken();
+
   try {
     const response = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer YOUR_TOKEN_HERE`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
@@ -121,7 +142,7 @@ async function editEmployee(id) {
           const updateResponse = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
             method: "PUT",
             headers: {
-              Authorization: `Bearer YOUR_TOKEN_HERE`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ username: name, role }),
@@ -152,6 +173,8 @@ async function editEmployee(id) {
 
 // Fungsi untuk menghapus karyawan
 async function deleteEmployee(id) {
+  const token = getAuthToken();
+
   Swal.fire({
     title: "Anda yakin?",
     text: "Data karyawan ini akan dihapus!",
@@ -166,7 +189,7 @@ async function deleteEmployee(id) {
         const response = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer YOUR_TOKEN_HERE`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -223,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   employeeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const token = getAuthToken();
     const id = document.getElementById("employee-id").value.trim();
     const name = document.getElementById("employee-name").value.trim();
     const role = document.getElementById("employee-role").value;
@@ -241,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch("https://apklaundry.vercel.app/employee", {
         method: "POST",
         headers: {
-          Authorization: `Bearer YOUR_TOKEN_HERE`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ id, username: name, role }),
