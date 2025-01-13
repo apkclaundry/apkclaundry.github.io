@@ -3,127 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Page</title>
+    <title>Laundry POS</title>
+    <link rel="icon" href="static/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="src/css/register.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 16px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            display: none; /* Hidden by default */
-        }
-
-        .message.success {
-            border: 2px solid #28a745;
-        }
-
-        .message.error {
-            border: 2px solid #dc3545;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="register-container">
-            <h2>Register</h2>
-            <div class="loginform">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" placeholder="Enter your name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phonenumber">Phone Number</label>
-                    <input type="text" id="phonenumber" placeholder="Enter your phone number" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <div class="form-group">
-                    <button type="button" onclick="registerUser()">Register</button>
-                </div>
-                <div class="form-group">
-                    <button id="back-btn" class="link-style">Back to main menu</button>
-                </div>
-                <div class="message" id="message"></div>
+    <section class="vh-100">
+        <div class="container-fluid h-custom">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-9 col-lg-6 col-xl-5">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
+                class="img-fluid" alt="Sample image">
             </div>
-            <div class="whats-auth">
-                <a href="https://itung.in.my.id/login/">Use Whatsauth</a>
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+              <form id="registerForm">
+                <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+                  <p class="lead fw-normal mb-0 me-3">Sign up with</p>
+                  <button type="button" class="btn btn-primary btn-floating mx-1">
+                    <i class="fab fa-whatsapp"></i>
+                  </button>
+                </div>
+      
+                <div class="divider d-flex align-items-center my-4">
+                  <p class="text-center fw-bold mx-3 mb-0">Or</p>
+                </div>
+
+                <!-- Name input -->
+                <div class="form-outline mb-4">
+                    <input type="text" id="name" class="form-control form-control-lg" placeholder="Enter your name" required />
+                    <label class="form-label" for="name">Name</label>
+                </div>
+      
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                    <input type="username" id="username" class="form-control form-control-lg" placeholder="Enter your username" required />
+                    <label class="form-label" for="username">Username</label>
+                </div>
+      
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <input type="password" id="password" class="form-control form-control-lg" placeholder="Enter your password" required />
+                    <label class="form-label" for="password">Password</label>
+                </div>
+      
+                <div class="text-center text-lg-start mt-4 pt-2">
+                  <button type="submit" class="btn btn-primary btn-lg"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Sign Up</button>
+                  <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="login.html"
+                      class="link-primary">Sign In</a></p>
+                  <button id="back-btn" class="btn btn-secondary btn-lg">Back to Main Menu</button>
+                </div>
+              </form>
             </div>
-            <div class="forgot-password">
-                <a href="https://itung.in.my.id/login.html">Already have an account?</a>
-            </div>
+          </div>
         </div>
-    </div>
-
-    <script>
-        // Event listener untuk tombol "Back to main menu"
-        document.getElementById('back-btn').addEventListener('click', function (e) {
-            e.preventDefault(); // Mencegah default button behavior
-            window.location.href = 'index.html'; // Redirect ke halaman LP.html
-        });
-
-        // Fungsi untuk menampilkan pesan
-        function showMessage(message, type) {
-            const messageBox = document.getElementById('message');
-            messageBox.textContent = message;
-            messageBox.className = `message ${type}`;
-            messageBox.style.display = 'block';
-
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 3000);
-        }
-
-        // Fungsi untuk register user
-        function registerUser() {
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phonenumber').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            if (!name || !email || !phone || !password) {
-                showMessage('Please fill in all fields!', 'error');
-                return;
-            }
-
-            const user = { name, email, phone, password };
-
-            // Ambil data existing dari local storage
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-
-            // Cek apakah email sudah terdaftar
-            const isEmailExists = users.some(u => u.email === email);
-            if (isEmailExists) {
-                showMessage('Email is already registered!', 'error');
-                return;
-            }
-
-            // Simpan user ke local storage
-            users.push(user);
-            localStorage.setItem('users', JSON.stringify(users));
-            showMessage('Registration successful!', 'success');
-
-            // Reset form
-            document.getElementById('name').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('phonenumber').value = '';
-            document.getElementById('password').value = '';
-        }
-    </script>
-</body>
+      </section>
+      <script type="module" src="src/js/register.js"></script>
+    </body>
 </html>
