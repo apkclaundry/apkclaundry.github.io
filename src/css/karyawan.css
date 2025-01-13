@@ -68,7 +68,7 @@
     font-weight: bold; /* Update */
   }
   
-  #employee-id, #employee-name, #employee-role, .btn-save {
+  #employee-id, #employee-name, #employee-phone, #employee-address, #employee-role, .btn-save {
     width: 100%;
     padding: 10px;
     margin-top: 5px;

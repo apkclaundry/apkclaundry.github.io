@@ -197,7 +197,7 @@ async function deleteEmployee(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
+        const response = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -258,11 +258,12 @@ document.addEventListener("DOMContentLoaded", () => {
   employeeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const token = getAuthToken();
-    const id = document.getElementById("employee-id").value.trim();
     const name = document.getElementById("employee-name").value.trim();
+    const phone = document.getElementById("employee-phone").value.trim();
+    const address = document.getElementById("employee-address").value.trim();
     const role = document.getElementById("employee-role").value;
 
-    if (!id || !name || !role) {
+    if (!name || !phone || !address || !role) {
       Swal.fire({
         title: "Peringatan!",
         text: "Mohon lengkapi semua data!",
@@ -273,13 +274,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch("https://apkclaundry.vercel.app/employee", {
+      const response = await fetch("https://apkclaundry.vercel.app/Register", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, username: name, role }),
+        body: JSON.stringify({ username: name, phone, address, role }),
       });
 
       if (!response.ok) {
