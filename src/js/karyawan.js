@@ -6,6 +6,7 @@ addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 // Fungsi untuk mendapatkan token dari localStorage
 function getAuthToken() {
   const token = localStorage.getItem("authToken");
+  console.log("Token retrieved from localStorage:", token); // Debug log
   if (!token) {
     Swal.fire({
       title: "Error!",
@@ -25,20 +26,27 @@ async function fetchEmployees() {
   const token = getAuthToken();
 
   try {
-    const response = await fetch("https://apklaundry.vercel.app/employee", {
+    console.log("Fetching employees with token:", token);
+
+    const response = await fetch("https://apkclaundry.vercel.app/employee", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // Menggunakan token yang benar
         "Content-Type": "application/json",
       },
     });
 
+    console.log("Response status:", response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error details:", errorText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const employees = await response.json();
-    displayEmployees(employees); // Panggil fungsi untuk menampilkan data
+    console.log("Employees fetched:", employees);
+    displayEmployees(employees);
   } catch (error) {
     console.error("Error fetching employees:", error);
     Swal.fire({
@@ -96,12 +104,15 @@ function displayEmployees(employees) {
   });
 }
 
+// Fungsi lainnya seperti editEmployee, deleteEmployee, searchEmployees tetap sama...
+
+
 // Fungsi untuk mengedit data karyawan
 async function editEmployee(id) {
   const token = getAuthToken();
 
   try {
-    const response = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
+    const response = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -139,7 +150,7 @@ async function editEmployee(id) {
         }
 
         try {
-          const updateResponse = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
+          const updateResponse = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
             method: "PUT",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -186,7 +197,7 @@ async function deleteEmployee(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`https://apklaundry.vercel.app/employee/${id}`, {
+        const response = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -262,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch("https://apklaundry.vercel.app/employee", {
+      const response = await fetch("https://apkclaundry.vercel.app/employee", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
