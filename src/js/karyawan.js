@@ -231,6 +231,64 @@ async function deleteEmployee(id) {
 
 // Event listener untuk memuat data
 document.addEventListener("DOMContentLoaded", () => {
+  const employeeForm = document.getElementById("employee-form");
+  const searchInput = document.getElementById("search-input");
+
+  if (!employeeForm) {
+    console.error("Form karyawan tidak ditemukan.");
+    return;
+  }
+
+  employeeForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const token = getAuthToken();
+    const name = document.getElementById("employee-name").value.trim();
+    const phone = document.getElementById("employee-phone").value.trim();
+    const address = document.getElementById("employee-address").value.trim();
+    const role = document.getElementById("employee-role").value;
+
+    if (!name || !phone || !address || !role) {
+      Swal.fire({
+        title: "Peringatan!",
+        text: "Mohon lengkapi semua data!",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("https://apkclaundry.vercel.app/Register", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: name, phone, address, role }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      Swal.fire("Berhasil!", "Data karyawan berhasil ditambahkan.", "success");
+      fetchEmployees(); // Refresh data
+      employeeForm.reset();
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Gagal menambahkan data karyawan.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener("input", searchEmployees);
+  }
+
   fetchEmployees(); // Ambil data karyawan saat halaman dimuat
 });
 
