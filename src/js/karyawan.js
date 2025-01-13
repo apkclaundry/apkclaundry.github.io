@@ -104,15 +104,12 @@ function displayEmployees(employees) {
   });
 }
 
-// Fungsi lainnya seperti editEmployee, deleteEmployee, searchEmployees tetap sama...
-
-
 // Fungsi untuk mengedit data karyawan
 async function editEmployee(id) {
   const token = getAuthToken();
 
   try {
-    const response = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
+    const response = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -129,8 +126,13 @@ async function editEmployee(id) {
     Swal.fire({
       title: "Edit Karyawan",
       html: `
-        <input id="swal-input-id" class="swal2-input" value="${employee.id}" disabled>
+        <label for="swal-input-name">Nama Karyawan</label>
         <input id="swal-input-name" class="swal2-input" value="${employee.username}">
+        <label for="swal-input-phone">Nomor Telepon</label>
+        <input id="swal-input-phone" class="swal2-input" value="${employee.phone}">
+        <label for="swal-input-address">Alamat</label>
+        <input id="swal-input-address" class="swal2-input" value="${employee.address}">
+        <label for="swal-input-role">Role</label>
         <select id="swal-input-role" class="swal2-input">
           <option value="admin" ${employee.role === "admin" ? "selected" : ""}>Admin</option>
           <option value="Laundry Cleaner" ${employee.role === "Laundry Cleaner" ? "selected" : ""}>Laundry Cleaner</option>
@@ -140,23 +142,27 @@ async function editEmployee(id) {
         </select>
       `,
       focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: "Update",
       preConfirm: async () => {
-        const name = document.getElementById("swal-input-name").value.trim();
+        const username = document.getElementById("swal-input-name").value.trim();
+        const phone = document.getElementById("swal-input-phone").value.trim();
+        const address = document.getElementById("swal-input-address").value.trim();
         const role = document.getElementById("swal-input-role").value;
 
-        if (!name || !role) {
-          Swal.showValidationMessage("Mohon lengkapi data!");
-          return;
+        if (!username || !phone || !address || !role) {
+          Swal.showValidationMessage("Semua bidang harus diisi!");
+          return false;
         }
 
         try {
-          const updateResponse = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
+          const updateResponse = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
             method: "PUT",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username: name, role }),
+            body: JSON.stringify({ username, phone, address, role }),
           });
 
           if (!updateResponse.ok) {
@@ -191,13 +197,12 @@ async function deleteEmployee(id) {
     text: "Data karyawan ini akan dihapus!",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonText: "Ya, Hapus!",
+    confirmButtonText: "Ya, Hapus",
     cancelButtonText: "Batal",
-    reverseButtons: true,
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`https://apkclaundry.vercel.app/employee/${id}`, {
+        const response = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -224,88 +229,11 @@ async function deleteEmployee(id) {
   });
 }
 
-// Fungsi untuk pencarian karyawan
-function searchEmployees() {
-  const searchInput = document.getElementById("search-input");
-  if (!searchInput) {
-    console.error("Input pencarian tidak ditemukan.");
-    return;
-  }
-
-  const searchValue = searchInput.value.toLowerCase();
-  const employeeRows = document.querySelectorAll("#employee-table tbody tr");
-
-  employeeRows.forEach((row) => {
-    const username = row.cells[1].textContent.toLowerCase();
-    if (username.includes(searchValue)) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
-
-// Event listener pada DOM
+// Event listener untuk memuat data
 document.addEventListener("DOMContentLoaded", () => {
-  const employeeForm = document.getElementById("employee-form");
-  const searchInput = document.getElementById("search-input");
-
-  if (!employeeForm) {
-    console.error("Form karyawan tidak ditemukan.");
-    return;
-  }
-
-  employeeForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const token = getAuthToken();
-    const id = document.getElementById("employee-id").value.trim();
-    const name = document.getElementById("employee-name").value.trim();
-    const role = document.getElementById("employee-role").value;
-
-    if (!id || !name || !role) {
-      Swal.fire({
-        title: "Peringatan!",
-        text: "Mohon lengkapi semua data!",
-        icon: "warning",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch("https://apkclaundry.vercel.app/employee", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, username: name, role }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      Swal.fire("Berhasil!", "Data karyawan berhasil ditambahkan.", "success");
-      fetchEmployees(); // Refresh data
-      employeeForm.reset();
-    } catch (error) {
-      console.error("Error adding employee:", error);
-      Swal.fire({
-        title: "Error!",
-        text: "Gagal menambahkan data karyawan.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    }
-  });
-
-  if (searchInput) {
-    searchInput.addEventListener("input", searchEmployees);
-  }
-
   fetchEmployees(); // Ambil data karyawan saat halaman dimuat
 });
+
 
 window.editEmployee = editEmployee;
 window.deleteEmployee = deleteEmployee;

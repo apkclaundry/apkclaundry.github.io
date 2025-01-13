@@ -79,12 +79,12 @@
     <h1 class="title">LaundryKuy - Manajemen Karyawan</h1>
     <form id="employee-form">
       <div class="form-group">
-        <label for="employee-id">ID Karyawan</label>
-        <input type="text" id="employee-id" placeholder="Masukkan ID Karyawan" required />
+        <label for="employee-name">Nama Karyawan</label>
+        <input type="text" id="employee-name" placeholder="Masukkan Nama Karyawan" required />
       </div>
       <div class="form-group">
-        <label for="employee-name">Nama Karyawan</label>
-        <input type="text" id="employee-name" placeholder="Masukkan nama karyawan" required />
+        <label for="employee-telp">Nomor Telphone</label>
+        <input type="text" id="employee-telp" placeholder="Masukkan Nomor Telphone" required />
       </div>
       <div class="form-group">
         <label for="employee-role">Role</label>
@@ -96,6 +96,10 @@
           <option value="Laundry Kasir">Laundry Kasir</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="employee-alamat">Alamat</label>
+        <input type="text" id="employee-alamat" placeholder="Masukkan Alamat Karyawan" required />
+      </div>
       <button type="submit" class="btn-save">Simpan</button>
     </form>
 
@@ -105,7 +109,7 @@
     <table id="employee-table">
       <thead>
         <tr>
-          <th>ID Karyawan</th> <!-- Kolom baru -->
+          <th>ID Karyawan</th> 
           <th>Nama Karyawan</th>
           <th>Role</th>
           <th>No Telp</th>
