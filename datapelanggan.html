@@ -10,17 +10,16 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script type="module">
-      import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
       import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
-    
       addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
     
       // Fungsi untuk menyimpan token dari URL ke localStorage
       function saveTokenFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get("authToken");
-        if(token) {
+        if (token) {
           localStorage.setItem("authToken", token);
           console.log("Token berhasil disimpan ke localStorage:", token);
         } 
@@ -156,6 +155,31 @@
       document.querySelector(".burger").addEventListener("click", () => {
         const navLinks = document.querySelector(".nav-links");
         navLinks.classList.toggle("active");
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", function (event) {
+        event.preventDefault(); // Mencegah link untuk melakukan redirect langsung
+        
+        // Menampilkan notifikasi konfirmasi logout
+        Swal.fire({
+          title: 'Apakah Anda yakin?',
+          text: "Anda akan keluar dari akun ini.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Ya, Logout',
+          cancelButtonText: 'Batal',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Menghapus item dari localStorage
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userPhoneNumber");
+
+            // Redirect ke halaman login setelah logout
+            window.location.href = "https://apkclaundry.github.io/";
+          }
+        });
       });
     </script>
   </body>
