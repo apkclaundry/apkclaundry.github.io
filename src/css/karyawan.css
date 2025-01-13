@@ -191,6 +191,15 @@
     display: none;
     background: none;
     border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .burger {
+    display: none;
+    background: none;
+    border: none;
     cursor: pointer;
     font-size: 1.5rem;
   }
@@ -202,7 +211,7 @@
   .nav-links.active {
     display: flex;
     background-color: rgba(128, 128, 128, 0.9); /* Abu-abu semi-transparan lebih pekat */
-    border: 1px solid rgba(0, 0, 0, 0.2); /* Batas tipis semi-transparan */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Batas tipis semi-transparan */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   /* Responsif: Ubah tabel menjadi tampilan list pada layar kecil */

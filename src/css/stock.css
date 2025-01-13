@@ -170,7 +170,14 @@ nav {
 .nav-links li a:hover {
   text-decoration: underline;
 }
-
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
 .burger {
   display: none;
   background: none;
