@@ -3,185 +3,227 @@ import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js
 
 addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 
-// Ambil elemen-elemen yang diperlukan
 const saveButton = document.getElementById("save-btn");
 const customerForm = document.getElementById("customer-form");
 const orderTableBody = document.querySelector("#order-table tbody");
 
-// Ambil data pelanggan dari local storage
-function getCustomers() {
-  return JSON.parse(localStorage.getItem("customers")) || [];
-}
-
-// Simpan data pelanggan ke local storage
-function saveCustomers(customers) {
-  localStorage.setItem("customers", JSON.stringify(customers));
-}
-
-// Tambah pelanggan baru
-function addCustomer() {
-  const id = document.getElementById("customer-id").value.trim();
-  const name = document.getElementById("customer-name").value.trim();
-  const phone = document.getElementById("customer-phone").value.trim();
-  const address = document.getElementById("customer-address").value.trim();
-  const email = document.getElementById("customer-email").value.trim();
-
-  if (!id || !name || !phone || !address || !email) {
-    alert("Semua field wajib diisi!");
-    return;
-  }
-
-  const customers = getCustomers();
-  customers.push({ id, name, phone, address, email });
-  saveCustomers(customers);
-  displayCustomers();
-  customerForm.reset();
-}
-
-// Hapus pelanggan berdasarkan ID
-function deleteCustomer(customerId) {
-  let customers = getCustomers();
-  customers = customers.filter((customer) => customer.id !== customerId);
-  saveCustomers(customers);
-  displayCustomers();
-}
-
-// Edit pelanggan
-// Edit Customer Function with Swal
-function editCustomer(customerId) {
-    const customers = getCustomers();
-    const customer = customers.find((c) => c.id === customerId);
-  
-    if (!customer) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Pelanggan tidak ditemukan!",
-      });
-      return;
-    }
-  
-    Swal.fire({
-      title: "Edit Data Pelanggan",
-      html: `
-        <div>
-          <label for="edit-customer-id">ID Pelanggan:</label>
-          <input type="text" id="edit-customer-id" class="swal2-input" value="${customer.id}" disabled />
-        </div>
-        <div>
-          <label for="edit-customer-name">Nama:</label>
-          <input type="text" id="edit-customer-name" class="swal2-input" value="${customer.name}" />
-        </div>
-        <div>
-          <label for="edit-customer-phone">Nomor Telepon:</label>
-          <input type="text" id="edit-customer-phone" class="swal2-input" value="${customer.phone}" />
-        </div>
-        <div>
-          <label for="edit-customer-address">Alamat:</label>
-          <input type="text" id="edit-customer-address" class="swal2-input" value="${customer.address}" />
-        </div>
-        <div>
-          <label for="edit-customer-email">Email:</label>
-          <input type="email" id="edit-customer-email" class="swal2-input" value="${customer.email}" />
-        </div>
-      `,
-      focusConfirm: false,
-      preConfirm: () => {
-        const name = document.getElementById("edit-customer-name").value.trim();
-        const phone = document.getElementById("edit-customer-phone").value.trim();
-        const address = document.getElementById("edit-customer-address").value.trim();
-        const email = document.getElementById("edit-customer-email").value.trim();
-  
-        if (!name || !phone || !address || !email) {
-          Swal.showValidationMessage("Semua kolom harus diisi!");
-          return false;
-        }
-  
-        return { name, phone, address, email };
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Update customer data
-        customer.name = result.value.name;
-        customer.phone = result.value.phone;
-        customer.address = result.value.address;
-        customer.email = result.value.email;
-  
-        // Save updated customers to local storage
-        saveCustomers(customers);
-        displayCustomers();
-  
+// Fungsi untuk mendapatkan token dari localStorage
+function getAuthToken() {
+    const token = localStorage.getItem("authToken");
+    console.log("Token retrieved from localStorage:", token); // Debug log
+    if (!token) {
         Swal.fire({
-          icon: "success",
-          title: "Berhasil",
-          text: "Data pelanggan berhasil diperbarui!",
+            title: "Error!",
+            text: "Token tidak ditemukan, silakan login kembali.",
+            icon: "error",
+            confirmButtonText: "Login",
+        }).then(() => {
+            window.location.href = "/login.html"; // Ganti dengan halaman login Anda
         });
-      }
-    });
-  }
-  
-
-// Pastikan fungsi tersedia secara global
-window.deleteCustomer = deleteCustomer;
-window.editCustomer = editCustomer;
-
-// Tampilkan pelanggan dalam tabel
-function displayCustomers() {
-    const customers = getCustomers();
-    orderTableBody.innerHTML = "";
-  
-    // Bersihkan tampilan mobile jika ada
-    const orderList = document.querySelector(".order-list");
-    if (orderList) {
-      orderList.innerHTML = "";
+        throw new Error("Token tidak ditemukan di localStorage.");
     }
-  
-    customers.forEach((customer) => {
-      // Tambahkan data ke tabel desktop
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${customer.id}</td>
-        <td>${customer.name}</td>
-        <td>${customer.phone}</td>
-        <td>${customer.address}</td>
-        <td>${customer.email}</td>
-        <td>
-          <button class="btn-edit" onclick="editCustomer('${customer.id}')">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="btn-delete" onclick="deleteCustomer('${customer.id}')">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      `;
-      orderTableBody.appendChild(row);
-  
-      // Tambahkan data ke tampilan mobile
-      if (orderList) {
-        const listItem = document.createElement("div");
-        listItem.classList.add("order-item");
-        listItem.innerHTML = `
-          <p><strong>ID Pelanggan:</strong> ${customer.id}</p>
-          <p><strong>Nama Pelanggan:</strong> ${customer.name}</p>
-          <p><strong>Nomor Telepon:</strong> ${customer.phone}</p>
-          <p><strong>Alamat:</strong> ${customer.address}</p>
-          <p><strong>Email:</strong> ${customer.email}</p>
-          <div class="actions">
-            <button class="btn-edit" onclick="editCustomer('${customer.id}')">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button class="btn-delete" onclick="deleteCustomer('${customer.id}')">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
+    return token;
+}
+
+// Fungsi untuk mengambil semua pelanggan
+async function getCustomers() {
+    const token = getAuthToken();
+    try {
+        const response = await fetch('https://apkclaundry.vercel.app/customer', {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (response.status === 401) {
+            Swal.fire('Unauthorized', 'Please log in to access this resource', 'warning').then(() => {
+                window.location.href = '/login'; // Redirect to login page
+            });
+            return [];
+        }
+        if (response.status === 404) throw new Error('Data pelanggan tidak ditemukan');
+        if (!response.ok) throw new Error('Gagal mengambil data pelanggan');
+        const customers = await response.json();
+        return customers;
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', error.message, 'error');
+        return [];
+    }
+}
+
+// Fungsi untuk menambahkan pelanggan baru
+async function addCustomer() {
+    const name = document.getElementById("customer-name").value.trim();
+    const phone = document.getElementById("customer-phone").value.trim();
+    const address = document.getElementById("customer-address").value.trim();
+    const email = document.getElementById("customer-email").value.trim();
+
+    if (!name || !phone || !address || !email) {
+        Swal.fire('Peringatan', 'Semua field wajib diisi!', 'warning');
+        return;
+    }
+
+    const token = getAuthToken();
+    try {
+        const response = await fetch('https://apkclaundry.vercel.app/customer', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, phone, address, email })
+        });
+
+        if (!response.ok) throw new Error('Gagal menambahkan pelanggan');
+        Swal.fire('Sukses', 'Pelanggan berhasil ditambahkan!', 'success');
+        displayCustomers();
+        customerForm.reset();
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+// Fungsi untuk mengedit pelanggan
+async function editCustomer(customerId) {
+    console.log('Edit Customer ID:', customerId); // Debugging
+    if (!customerId) {
+        Swal.fire('Error', 'ID pelanggan tidak ditemukan', 'error');
+        return;
+    }
+
+    const token = getAuthToken();
+    try {
+        const response = await fetch(`https://apkclaundry.vercel.app/customer-id?id=${customerId}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) throw new Error('Gagal mengambil data pelanggan');
+        
+        const customer = await response.json();
+        console.log('Customer data:', customer); // Debugging
+
+        const { value: formValues } = await Swal.fire({
+            title: 'Edit Data Pelanggan',
+            html: `
+                <input id="swal-name" class="swal2-input" value="${customer.name}" placeholder="Nama">
+                <input id="swal-phone" class="swal2-input" value="${customer.phone}" placeholder="Telepon">
+                <input id="swal-address" class="swal2-input" value="${customer.address}" placeholder="Alamat">
+                <input id="swal-email" class="swal2-input" value="${customer.email}" placeholder="Email">
+            `,
+            focusConfirm: false,
+            preConfirm: () => {
+                return {
+                    name: document.getElementById('swal-name').value.trim(),
+                    phone: document.getElementById('swal-phone').value.trim(),
+                    address: document.getElementById('swal-address').value.trim(),
+                    email: document.getElementById('swal-email').value.trim(),
+                };
+            }
+        });
+
+        if (formValues) {
+            const updateResponse = await fetch(`https://apkclaundry.vercel.app/customer-id?id=${customerId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formValues)
+            });
+
+            if (!updateResponse.ok) throw new Error('Gagal memperbarui data pelanggan');
+            Swal.fire('Sukses', 'Data pelanggan diperbarui!', 'success');
+            displayCustomers();
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+// Fungsi untuk menghapus pelanggan
+async function deleteCustomer(customerId) {
+    console.log('Delete Customer ID:', customerId); // Debugging
+    if (!customerId) {
+        Swal.fire('Error', 'ID pelanggan tidak ditemukan', 'error');
+        return;
+    }
+
+    const token = getAuthToken();
+    try {
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data pelanggan akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            const deleteResponse = await fetch(`https://apkclaundry.vercel.app/customer-id?id=${customerId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!deleteResponse.ok) {
+                const errorMessage = await deleteResponse.text();
+                Swal.fire('Error', errorMessage, 'error');
+                return;
+            }
+            
+            Swal.fire('Sukses', 'Data pelanggan berhasil dihapus!', 'success');
+            displayCustomers();
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+// Fungsi untuk menampilkan data pelanggan di tabel
+async function displayCustomers() {
+    const customers = await getCustomers();
+    console.log('Customers:', customers); // Debugging: pastikan atribut ID terlihat dengan nama yang benar
+
+    orderTableBody.innerHTML = "";
+
+    customers.forEach(customer => {
+        console.log('Customer:', customer); // Debugging
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${customer.id}</td>
+            <td>${customer.name}</td>
+            <td>${customer.phone}</td>
+            <td>${customer.address}</td>
+            <td>${customer.email}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" onclick="editCustomer('${customer.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCustomer('${customer.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
         `;
-        orderList.appendChild(listItem);
-      }
+        orderTableBody.appendChild(row);
     });
-  }
-  
-// Event listener untuk tombol Simpan
+}
+
+// Event listener untuk menambahkan pelanggan
 saveButton.addEventListener("click", addCustomer);
 
-// Tampilkan data pelanggan saat halaman dimuat
+// Tampilkan pelanggan saat halaman dimuat
 document.addEventListener("DOMContentLoaded", displayCustomers);
+window.editCustomer = editCustomer;
+window.deleteCustomer = deleteCustomer;
+

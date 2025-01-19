@@ -3,200 +3,242 @@ import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js
 
 addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 
-// Ambil elemen-elemen yang diperlukan
-const saveButton = document.getElementById("save-btn");
-const supplierForm = document.getElementById("supplier-form");
-const supplierTableBody = document.querySelector("#supplier-table tbody");
-const supplierList = document.querySelector(".supplier-list");
-
-// Ambil data supplier dari local storage
-function getSuppliers() {
-  return JSON.parse(localStorage.getItem("suppliers")) || [];
+// Fungsi untuk mendapatkan token dari localStorage
+function getAuthToken() {
+  const token = localStorage.getItem("authToken");
+  console.log("Token retrieved from localStorage:", token); // Debug log
+  if (!token) {
+    Swal.fire({
+      title: "Error!",
+      text: "Token tidak ditemukan, silakan login kembali.",
+      icon: "error",
+      confirmButtonText: "Login",
+    }).then(() => {
+      window.location.href = "/login.html"; // Ganti dengan halaman login Anda
+    });
+    throw new Error("Token tidak ditemukan di localStorage.");
+  }
+  return token;
 }
 
-// Simpan data supplier ke local storage
-function saveSuppliers(suppliers) {
-  localStorage.setItem("suppliers", JSON.stringify(suppliers));
+async function getSuppliers() {
+  const token = getAuthToken();
+  try {
+    const response = await fetch('https://apkclaundry.vercel.app/supplier', {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) throw new Error('Gagal mengambil data supplier');
+    const suppliers = await response.json();
+    return suppliers;
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', error.message, 'error');
+    return [];
+  }
 }
 
-// Tambah supplier baru
-function addSupplier() {
-  const id = document.getElementById("supplier-id").value.trim();
-  const name = document.getElementById("supplier-name").value.trim();
-  const phone = document.getElementById("supplier-phone").value.trim();
+async function addSupplier() {
+  const token = getAuthToken();
+  const supplierName = document.getElementById("supplier-name").value.trim();
+  const phoneNumber = document.getElementById("supplier-phone").value.trim();
   const address = document.getElementById("supplier-address").value.trim();
   const email = document.getElementById("supplier-email").value.trim();
-  const products = document.getElementById("supplier-products").value.trim();
+  const suppliedProducts = document
+    .getElementById("supplier-products")
+    .value.trim()
+    .split(","); // Mengubah string menjadi array
 
-  if (!id || !name || !phone || !address || !email || !products) {
-    Swal.fire({
-      icon: "warning",
-      title: "Form Tidak Lengkap",
-      text: "Semua kolom wajib diisi!",
-    });
+  if (!supplierName || !phoneNumber || !address || !email || !suppliedProducts.length) {
+    Swal.fire('Peringatan', 'Semua field wajib diisi!', 'warning');
     return;
   }
 
-  const suppliers = getSuppliers();
-  suppliers.push({ id, name, phone, address, email, products });
-  saveSuppliers(suppliers);
-  displaySuppliers();
-  supplierForm.reset();
-
-  Swal.fire({
-    icon: "success",
-    title: "Berhasil",
-    text: "Supplier berhasil ditambahkan!",
-  });
-}
-
-// Hapus supplier berdasarkan ID
-function deleteSupplier(supplierId) {
-  let suppliers = getSuppliers();
-  suppliers = suppliers.filter((supplier) => supplier.id !== supplierId);
-  saveSuppliers(suppliers);
-  displaySuppliers();
-
-  Swal.fire({
-    icon: "success",
-    title: "Berhasil",
-    text: "Supplier berhasil dihapus!",
-  });
-}
-
-// Edit supplier dengan Swal
-function editSupplier(supplierId) {
-  const suppliers = getSuppliers();
-  const supplier = suppliers.find((s) => s.id === supplierId);
-
-  if (!supplier) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Supplier tidak ditemukan!",
+  try {
+    const response = await fetch('https://apkclaundry.vercel.app/supplier', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ supplier_name: supplierName, phone_number: phoneNumber, address, email, supplied_products: suppliedProducts })
     });
+
+    if (!response.ok) throw new Error('Gagal menambahkan supplier');
+    Swal.fire('Sukses', 'Supplier berhasil ditambahkan!', 'success');
+    displaySuppliers();
+    document.getElementById("supplier-form").reset(); // Reset form
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', error.message, 'error');
+  }
+}
+
+async function editSupplier(supplierId) {
+  const token = getAuthToken();
+  console.log('Edit Supplier ID:', supplierId); // Debugging
+  if (!supplierId) {
+    Swal.fire('Error', 'ID supplier tidak ditemukan', 'error');
     return;
   }
 
-  Swal.fire({
-    title: "Edit Data Supplier",
-    html: `
-      <div>
-        <label for="edit-supplier-id">ID Supplier:</label>
-        <input type="text" id="edit-supplier-id" class="swal2-input" value="${supplier.id}" disabled />
-      </div>
-      <div>
-        <label for="edit-supplier-name">Nama:</label>
-        <input type="text" id="edit-supplier-name" class="swal2-input" value="${supplier.name}" />
-      </div>
-      <div>
-        <label for="edit-supplier-phone">Nomor Telepon:</label>
-        <input type="text" id="edit-supplier-phone" class="swal2-input" value="${supplier.phone}" />
-      </div>
-      <div>
-        <label for="edit-supplier-address">Alamat:</label>
-        <input type="text" id="edit-supplier-address" class="swal2-input" value="${supplier.address}" />
-      </div>
-      <div>
-        <label for="edit-supplier-email">Email:</label>
-        <input type="email" id="edit-supplier-email" class="swal2-input" value="${supplier.email}" />
-      </div>
-      <div>
-        <label for="edit-supplier-products">Produk yang Disuplai:</label>
-        <textarea id="edit-supplier-products" class="swal2-textarea">${supplier.products}</textarea>
-      </div>
-    `,
-    focusConfirm: false,
-    preConfirm: () => {
-      const name = document.getElementById("edit-supplier-name").value.trim();
-      const phone = document.getElementById("edit-supplier-phone").value.trim();
-      const address = document.getElementById("edit-supplier-address").value.trim();
-      const email = document.getElementById("edit-supplier-email").value.trim();
-      const products = document.getElementById("edit-supplier-products").value.trim();
+  try {
+    const response = await fetch(`https://apkclaundry.vercel.app/supplier-id?id=${supplierId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) throw new Error('Gagal mengambil data supplier');
+    
+    const supplier = await response.json();
+    console.log('Supplier data:', supplier); // Debugging
 
-      if (!name || !phone || !address || !email || !products) {
-        Swal.showValidationMessage("Semua kolom harus diisi!");
-        return false;
+    Swal.fire({
+      title: 'Edit Data Supplier',
+      html: `
+        <input id="swal-name" class="swal2-input" value="${supplier.supplier_name}" placeholder="Nama Supplier">
+        <input id="swal-phone" class="swal2-input" value="${supplier.phone_number}" placeholder="Telepon">
+        <input id="swal-address" class="swal2-input" value="${supplier.address}" placeholder="Alamat">
+        <input id="swal-email" class="swal2-input" value="${supplier.email}" placeholder="Email">
+        <textarea id="swal-products" class="swal2-textarea" placeholder="Produk yang Disuplai">${supplier.supplied_products.join(", ")}</textarea>
+      `,
+      focusConfirm: false,
+      preConfirm: async () => {
+        const supplier_name = document.getElementById('swal-name').value.trim();
+        const phone_number = document.getElementById('swal-phone').value.trim();
+        const address = document.getElementById('swal-address').value.trim();
+        const email = document.getElementById('swal-email').value.trim();
+        const supplied_products = document
+          .getElementById('swal-products')
+          .value.trim()
+          .split(","); // Mengubah input menjadi array
+
+        if (!supplier_name || !phone_number || !address || !email || !supplied_products.length) {
+          Swal.showValidationMessage("Mohon lengkapi data!");
+          return;
+        }
+        
+        try {
+          const updateResponse = await fetch(`https://apkclaundry.vercel.app/supplier-id?id=${supplierId}`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ supplier_name, phone_number, address, email, supplied_products })
+          });
+
+          if (!updateResponse.ok) throw new Error('Gagal memperbarui data supplier');
+          Swal.fire('Sukses', 'Data supplier diperbarui!', 'success');
+          displaySuppliers();
+        } catch (error) {
+          console.error("Error updating supplier:", error);
+          Swal.fire("Error!", "Gagal memperbarui data supplier.", "error");
+        }
       }
+    });
+  } catch (error) {
+    console.error("Error fetching supplier:", error);
+    Swal.fire({
+      title: "Error!",
+      text: "Gagal mengambil data supplier.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+  }
+}
 
-      return { name, phone, address, email, products };
-    },
-  }).then((result) => {
+// Fungsi untuk menghapus supplier
+async function deleteSupplier(supplierId) {
+  const token = getAuthToken();
+  console.log('Delete Supplier ID:', supplierId); // Debugging
+  if (!supplierId) {
+    Swal.fire('Error', 'ID supplier tidak ditemukan', 'error');
+    return;
+  }
+
+  Swal.fire({
+    title: "Anda yakin?",
+    text: "Data supplier ini akan dihapus!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Hapus!",
+    cancelButtonText: "Batal",
+    reverseButtons: true,
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      supplier.name = result.value.name;
-      supplier.phone = result.value.phone;
-      supplier.address = result.value.address;
-      supplier.email = result.value.email;
-      supplier.products = result.value.products;
+      try {
+        const response = await fetch(`https://apkclaundry.vercel.app/supplier-id?id=${supplierId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-      saveSuppliers(suppliers);
-      displaySuppliers();
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Data supplier berhasil diperbarui!",
-      });
+        Swal.fire("Dihapus!", "Data supplier telah dihapus.", "success");
+        displaySuppliers(); // Refresh data
+      } catch (error) {
+        console.error("Error deleting supplier:", error);
+        Swal.fire({
+          title: "Error!",
+          text: "Gagal menghapus data supplier.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
     }
   });
 }
 
-// Pastikan fungsi tersedia secara global
-window.deleteSupplier = deleteSupplier;
-window.editSupplier = editSupplier;
+async function displaySuppliers() {
+  const suppliers = await getSuppliers();
 
-// Tampilkan supplier dalam tabel
-function displaySuppliers() {
-  const suppliers = getSuppliers();
-  supplierTableBody.innerHTML = "";
-  supplierList.innerHTML = "";
+  orderTableBody.innerHTML = "";
 
-  suppliers.forEach((supplier) => {
-    // Tambahkan ke tabel
+  suppliers.forEach(supplier => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${supplier.id}</td>
-      <td>${supplier.name}</td>
-      <td>${supplier.phone}</td>
+      <td>${supplier.supplier_name}</td>
+      <td>${supplier.phone_number}</td>
       <td>${supplier.address}</td>
       <td>${supplier.email}</td>
-      <td>${supplier.products}</td>
+      <td>${supplier.supplied_products.join(", ")}</td>
       <td>
-        <button class="btn-edit" onclick="editSupplier('${supplier.id}')">
-          <i class="fas fa-pencil-alt"></i>
+        <button class="btn btn-sm btn-warning" onclick="editSupplier('${supplier.id}')">
+          <i class="fas fa-edit"></i>
         </button>
-        <button class="btn-delete" onclick="deleteSupplier('${supplier.id}')">
+        <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">
           <i class="fas fa-trash"></i>
         </button>
       </td>
     `;
-    supplierTableBody.appendChild(row);
-
-    // Tambahkan ke tampilan mobile
-    const listItem = document.createElement("div");
-    listItem.classList.add("supplier-item");
-    listItem.innerHTML = `
-      <p><strong>ID Supplier:</strong> ${supplier.id}</p>
-      <p><strong>Nama:</strong> ${supplier.name}</p>
-      <p><strong>Nomor Telepon:</strong> ${supplier.phone}</p>
-      <p><strong>Alamat:</strong> ${supplier.address}</p>
-      <p><strong>Email:</strong> ${supplier.email}</p>
-      <p><strong>Produk:</strong> ${supplier.products}</p>
-      <div class="actions">
-        <button class="btn-edit" onclick="editSupplier('${supplier.id}')">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="btn-delete" onclick="deleteSupplier('${supplier.id}')">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    `;
-    supplierList.appendChild(listItem);
+    orderTableBody.appendChild(row);
   });
 }
 
-// Event listener untuk tombol Simpan
-saveButton.addEventListener("click", addSupplier);
+const saveButton = document.getElementById("save-btn");
+const orderTableBody = document.querySelector("#supplier-table tbody");
 
-// Tampilkan data supplier saat halaman dimuat
+if (saveButton) {
+  // Event listener untuk menambahkan supplier
+  saveButton.addEventListener("click", addSupplier);
+} else {
+  console.error("saveButton element not found");
+}
+
+// Tampilkan supplier saat halaman dimuat
 document.addEventListener("DOMContentLoaded", displaySuppliers);
+window.editSupplier = editSupplier;
+window.deleteSupplier = deleteSupplier;
+
