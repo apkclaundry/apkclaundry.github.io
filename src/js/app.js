@@ -103,10 +103,14 @@ async function fetchOrders() {
     const orders = await response.json();
 
     const tableBody = document.querySelector('#order-table tbody');
+    const orderList = document.querySelector('.order-list');
     tableBody.innerHTML = '';
+    orderList.innerHTML = '';
+
     orders.forEach(order => {
+      // Tabel untuk desktop
       const row = document.createElement('tr');
-      row.dataset.id = order.id; // Pastikan menggunakan 'id' dari respons backend
+      row.dataset.id = order.id;
       row.innerHTML = `
         <td>${order.customer_name}</td>
         <td>${order.phone_number}</td>
@@ -121,13 +125,35 @@ async function fetchOrders() {
         </td>
       `;
       tableBody.appendChild(row);
-    });
 
+      // Daftar untuk mobile
+      const listItem = document.createElement("div");
+      listItem.classList.add("order-item");
+      listItem.dataset.id = order.id; // Tambahkan ID pada data-id
+      listItem.innerHTML = `
+        <p><strong>Nama Pelanggan:</strong> ${order.customer_name}</p>
+        <p><strong>Nomor Telepon:</strong> ${order.phone_number}</p>
+        <p><strong>Jenis Layanan:</strong> ${order.service_type}</p>
+        <p><strong>Berat (KG):</strong> ${order.weight_per_kg}</p>
+        <p><strong>Total Harga:</strong> Rp${order.total_price.toLocaleString("id-ID")}</p>
+        <p><strong>Tanggal:</strong> ${order.transaction_date || "-"}</p>
+        <p style="color: ${order.isPaid ? "green" : "red"}; font-weight: bold;"><strong>Payment Status:</strong> ${
+          order.isPaid ? "Paid" : "Not Paid"
+        }</p>
+        <div class="actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      `;
+      orderList.appendChild(listItem);
+      
+    });
   } catch (error) {
     console.error('Error saat mengambil data:', error);
     Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
   }
 }
+
 
 // Panggil fetchOrders saat halaman dimuat
 document.addEventListener('DOMContentLoaded', fetchOrders);
@@ -226,6 +252,7 @@ document.querySelector('#order-table tbody').addEventListener('click', async fun
     }
   }
 });
+
 // Event delegation untuk tombol Delete
 document.querySelector('#order-table tbody').addEventListener('click', async function (event) {
   if (event.target.classList.contains('delete-btn')) {
@@ -272,3 +299,149 @@ document.querySelector('#order-table tbody').addEventListener('click', async fun
     });
   }
 });
+
+// Event delegation untuk daftar mobile
+document.querySelector(".order-list").addEventListener("click", async function (event) {
+  const target = event.target;
+
+  if (target.classList.contains("edit-btn")) {
+    const parentElement = target.closest(".order-item"); // Ambil elemen parent dengan class "order-item"
+    const orderId = parentElement.dataset.id; // Ambil ID dari atribut data-id
+    await handleEdit(orderId); // Panggil fungsi edit
+  }
+
+  if (target.classList.contains("delete-btn")) {
+    const parentElement = target.closest(".order-item"); // Ambil elemen parent dengan class "order-item"
+    const orderId = parentElement.dataset.id; // Ambil ID dari atribut data-id
+    await handleDelete(orderId); // Panggil fungsi delete
+  }
+});
+
+async function handleEdit(orderId) {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const order = await response.json();
+
+    Swal.fire({
+      title: 'Edit Pesanan',
+      html: `
+        <label for="edit-name">Nama Pelanggan:</label>
+        <input type="text" id="edit-name" class="swal2-input" value="${order.customer_name}" required>
+
+        <label for="edit-phone">Nomor Telepon:</label>
+        <input type="text" id="edit-phone" class="swal2-input" value="${order.phone_number}" required>
+
+        <label for="edit-service">Jenis Layanan:</label>
+        <select id="edit-service" class="swal2-input">
+          <option value="cuci" ${order.service_type === 'cuci' ? 'selected' : ''}>Cuci</option>
+          <option value="setrika" ${order.service_type === 'setrika' ? 'selected' : ''}>Setrika</option>
+          <option value="cuci-setrika" ${order.service_type === 'cuci-setrika' ? 'selected' : ''}>Cuci + Setrika</option>
+        </select>
+
+        <label for="edit-weight">Berat (KG):</label>
+        <input type="number" id="edit-weight" class="swal2-input" value="${order.weight_per_kg}" required>
+
+        <label for="edit-total-price">Total Harga:</label>
+        <input type="text" id="edit-total-price" class="swal2-input" value="${order.total_price}" readonly>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Simpan Perubahan',
+      cancelButtonText: 'Batal',
+      preConfirm: () => {
+        const updatedName = document.getElementById('edit-name').value;
+        const updatedPhone = document.getElementById('edit-phone').value;
+        const updatedService = document.getElementById('edit-service').value;
+        const updatedWeight = parseFloat(document.getElementById('edit-weight').value);
+
+        if (!updatedName || !updatedPhone || !updatedService || isNaN(updatedWeight) || updatedWeight <= 0) {
+          Swal.showValidationMessage('Harap isi semua data dengan benar!');
+          return false;
+        }
+
+        return {
+          customer_name: updatedName,
+          phone_number: updatedPhone,
+          service_type: updatedService,
+          weight_per_kg: updatedWeight,
+          total_price: updatedWeight * servicePrices[updatedService],
+        };
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const updatedOrder = result.value;
+
+        const updateResponse = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(updatedOrder),
+        });
+
+        if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          throw new Error(`HTTP error! status: ${updateResponse.status}, message: ${errorText}`);
+        }
+
+        Swal.fire('Berhasil!', 'Data pesanan berhasil diperbarui.', 'success');
+        fetchOrders(); // Refresh tabel setelah pengeditan
+      }
+    });
+  } catch (error) {
+    console.error('Error saat mengedit data:', error);
+    Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
+  }
+}
+
+
+async function handleDelete(orderId) {
+  Swal.fire({
+    title: 'Konfirmasi Hapus',
+    text: 'Apakah Anda yakin ingin menghapus data pesanan ini?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
+          return;
+        }
+
+        const response = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        Swal.fire('Berhasil!', 'Data pesanan berhasil dihapus.', 'success');
+        fetchOrders(); // Refresh tabel setelah penghapusan
+      } catch (error) {
+        console.error('Error saat menghapus data:', error);
+        Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
+      }
+    }
+  });
+}
