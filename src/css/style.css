@@ -321,19 +321,6 @@ table#order-table td {
   color: #333;
 }
 
-/* Hide nav-links on mobile by default */
-/* .nav-links {
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  z-index: 10;
-}  */
 
 .nav-links.active {
   display: flex;

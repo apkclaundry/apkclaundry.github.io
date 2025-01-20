@@ -27,203 +27,248 @@ document.getElementById('calculate-btn').addEventListener('click', function () {
   document.getElementById('total-price').value = `Rp${totalPrice.toLocaleString('id-ID')}`;
 });
 
-// Simpan data ke local storage
-document.getElementById('save-btn').addEventListener('click', function () {
+// Fungsi untuk menyimpan data ke database
+document.getElementById('save-btn').addEventListener('click', async function () {
   const name = document.getElementById('customer-name').value;
   const phone = document.getElementById('customer-phone').value;
   const service = document.getElementById('service-type').value;
-  const weight = document.getElementById('weight').value;
-  const totalPrice = document.getElementById('total-price').value;
+  const weight = parseFloat(document.getElementById('weight').value);
+  const totalPriceInput = document.getElementById('total-price').value.replace(/Rp|,/g, '');
+  const totalPrice = parseFloat(totalPriceInput) * 1000;
 
-  if (!name || !phone || !service || !weight || !totalPrice) {
-    Swal.fire('Error', 'Harap isi semua data sebelum menyimpan!', 'error');
+  if (!name || !phone || !service || isNaN(weight) || weight <= 0 || isNaN(totalPrice)) {
+    Swal.fire('Error', 'Harap isi semua data dengan benar!', 'error');
     return;
   }
 
-  // Tambahkan tanggal saat ini
-  const date = new Date().toLocaleString('id-ID', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
+    return;
+  }
 
-  const order = { 
-    id: Date.now(),  // Menambahkan ID unik menggunakan timestamp
-    name, 
-    phone, 
-    service, 
-    weight, 
-    totalPrice, 
-    date, 
-    isPaid: false 
+  const data = {
+    customer_name: name,
+    phone_number: phone,
+    service_type: service,
+    weight_per_kg: weight,
+    total_price: totalPrice,
   };
 
-  let orders = JSON.parse(localStorage.getItem('orders')) || [];
-  orders.push(order);
-  localStorage.setItem('orders', JSON.stringify(orders));
+  try {
+    const response = await fetch('https://apkclaundry.vercel.app/transaction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-  displayOrders();
-  document.getElementById('order-form').reset();
-  document.getElementById('total-price').value = '';
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
 
-  Swal.fire('Berhasil!', 'Pesanan berhasil disimpan.', 'success');
-});
-
-
-function displayOrders() {
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  const tableBody = document.querySelector('#order-table tbody');
-  const orderList = document.querySelector('.order-list');
-
-  tableBody.innerHTML = '';
-  orderList.innerHTML = '';
-
-  orders.forEach((order, index) => {
-    const paymentStatus = order.isPaid ? 'Paid' : 'Not Paid';
-    const paymentColor = order.isPaid ? 'green' : 'red';
-
-    const row = document.createElement('tr');
-    row.dataset.index = index; // Simpan index sebagai data atribut
-    row.innerHTML = `
-      <td>${order.name}</td>
-      <td>${order.phone}</td>
-      <td>${order.service}</td>
-      <td>${order.weight}</td>
-      <td>${order.totalPrice}</td>
-      <td>${order.date}</td>
-      <td style="color: ${paymentColor}; font-weight: bold;">${paymentStatus}</td>
-      <td>
-        <button onclick="window.location.href='transaksi.html?id=${order.id}'">Payment</button>
-        <button class="edit" title="Edit"><i class="fa fa-pencil-alt"></i></button>
-        <button class="delete" title="Delete"><i class="fa fa-trash-alt"></i></button>
-      </td>
-    `;
-    tableBody.appendChild(row);
-
-    // Tambahkan data ke list versi mobile
-    const listItem = document.createElement('div');
-    listItem.classList.add('order-item');
-    listItem.innerHTML = `
-      <p><strong>Nama Pelanggan:</strong> ${order.name}</p>
-      <p><strong>Nomor Telepon:</strong> ${order.phone}</p>
-      <p><strong>Jenis Layanan:</strong> ${order.service}</p>
-      <p><strong>Berat (KG):</strong> ${order.weight}</p>
-      <p><strong>Total Harga:</strong> ${order.totalPrice}</p>
-      <p><strong>Tanggal:</strong> ${order.date}</p>
-      <p style="color: ${paymentColor}; font-weight: bold;" ><strong>Payment Status:</strong > ${paymentStatus}</p>
-      <div class="actions">
-        <button onclick="window.location.href='transaksi.html?id=${order.id}'">Payment</button>
-        <button class="edit" onclick="editOrder(${index})">Edit</button>
-        <button class="delete" onclick="deleteOrder(${index})">Delete</button>
-      </div>
-    `;
-    orderList.appendChild(listItem);
-  });
-}
-
-// Event delegation untuk tombol Payment, Edit, dan Delete
-document.querySelector('#order-table tbody').addEventListener('click', function (event) {
-  const target = event.target;
-  const row = target.closest('tr');
-  const index = parseInt(row.dataset.index, 10);
-
-  if (target.classList.contains('payment')) {
-    processPayment(index);
-  } else if (target.classList.contains('edit') || target.closest('.edit')) {
-    editOrder(index);
-  } else if (target.classList.contains('delete') || target.closest('.delete')) {
-    deleteOrder(index);
+    Swal.fire('Berhasil!', 'Pesanan berhasil disimpan.', 'success').then(() => {
+      window.location.href = 'dashboard.html';
+    });
+  } catch (error) {
+    console.error('Error saat menyimpan data:', error);
+    Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
   }
 });
 
-function processPayment(index) {
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  orders[index].isPaid = true;
-  localStorage.setItem('orders', JSON.stringify(orders));
-  displayOrders();
-  Swal.fire('Berhasil!', 'Pembayaran berhasil diproses.', 'success');
+// Fungsi untuk mengambil data dari backend dan menampilkan di tabel
+async function fetchOrders() {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
+      return;
+    }
+
+    const response = await fetch('https://apkclaundry.vercel.app/transaction', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const orders = await response.json();
+
+    const tableBody = document.querySelector('#order-table tbody');
+    tableBody.innerHTML = '';
+    orders.forEach(order => {
+      const row = document.createElement('tr');
+      row.dataset.id = order.id; // Pastikan menggunakan 'id' dari respons backend
+      row.innerHTML = `
+        <td>${order.customer_name}</td>
+        <td>${order.phone_number}</td>
+        <td>${order.service_type}</td>
+        <td>${order.weight_per_kg}</td>
+        <td>Rp${order.total_price.toLocaleString('id-ID')}</td>
+        <td>${order.transaction_date || '-'}</td>
+        <td style="color: ${order.isPaid ? 'green' : 'red'}; font-weight: bold;">${order.isPaid ? 'Paid' : 'Not Paid'}</td>
+        <td>
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error('Error saat mengambil data:', error);
+    Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
+  }
 }
 
-function editOrder(index) {
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  const order = orders[index];
+// Panggil fetchOrders saat halaman dimuat
+document.addEventListener('DOMContentLoaded', fetchOrders);
 
-  // Menyiapkan konten form di dalam SweetAlert2 popup
-  const content = `
-    <label for="edit-name">Nama Pelanggan:</label>
-    <input type="text" id="edit-name" class="swal2-input" value="${order.name}" required>
+// Event delegation untuk tombol Edit
+document.querySelector('#order-table tbody').addEventListener('click', async function (event) {
+  if (event.target.classList.contains('edit-btn')) {
+    const row = event.target.closest('tr');
+    const orderId = row.dataset.id; // Ambil ID dari atribut data-id
 
-    <label for="edit-phone">Nomor Telepon:</label>
-    <input type="text" id="edit-phone" class="swal2-input" value="${order.phone}" required>
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-    <label for="edit-service">Jenis Layanan:</label>
-    <select id="edit-service" class="swal2-input" required>
-      <option value="cuci-setrika" ${order.service === 'cuci-setrika' ? 'selected' : ''}>Cuci & Setrika</option>
-      <option value="cuci" ${order.service === 'cuci' ? 'selected' : ''}>Cuci</option>
-      <option value="setrika" ${order.service === 'setrika' ? 'selected' : ''}>Setrika</option>
-    </select>
-
-    <label for="edit-weight">Berat (KG):</label>
-    <input type="number" id="edit-weight" class="swal2-input" value="${order.weight}" required>
-
-    <label for="edit-total-price">Total Harga:</label>
-    <input type="text" id="edit-total-price" class="swal2-input" value="${order.totalPrice}" readonly>
-  `;
-
-  // Menampilkan SweetAlert2 popup
-  Swal.fire({
-    title: 'Edit Pesanan',
-    html: content,
-    showCancelButton: true,
-    confirmButtonText: 'Simpan Perubahan',
-    cancelButtonText: 'Batal',
-    preConfirm: () => {
-      const updatedName = document.getElementById('edit-name').value;
-      const updatedPhone = document.getElementById('edit-phone').value;
-      const updatedService = document.getElementById('edit-service').value;
-      const updatedWeight = parseFloat(document.getElementById('edit-weight').value);
-
-      if (!updatedName || !updatedPhone || !updatedService || isNaN(updatedWeight) || updatedWeight <= 0) {
-        Swal.showValidationMessage('Harap isi semua data dengan benar!');
-        return false;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      const updatedOrder = {
-        name: updatedName,
-        phone: updatedPhone,
-        service: updatedService,
-        weight: updatedWeight,
-        totalPrice: `Rp${(updatedWeight * servicePrices[updatedService]).toLocaleString('id-ID')}`,
-        date: order.date, // Tanggal tetap sama
-        isPaid: order.isPaid, // Status pembayaran tetap sama
-      };
+      const order = await response.json();
 
-      // Perbarui data pada indeks yang sesuai
-      orders[index] = updatedOrder;
-      localStorage.setItem('orders', JSON.stringify(orders));
-      displayOrders(); // Tampilkan kembali daftar pesanan
+      Swal.fire({
+        title: 'Edit Pesanan',
+        html: `
+          <label for="edit-name">Nama Pelanggan:</label>
+          <input type="text" id="edit-name" class="swal2-input" value="${order.customer_name}" required>
 
-      return updatedOrder;
+          <label for="edit-phone">Nomor Telepon:</label>
+          <input type="text" id="edit-phone" class="swal2-input" value="${order.phone_number}" required>
+
+          <label for="edit-service">Jenis Layanan:</label>
+          <select id="edit-service" class="swal2-input">
+            <option value="cuci" ${order.service_type === 'cuci' ? 'selected' : ''}>Cuci</option>
+            <option value="setrika" ${order.service_type === 'setrika' ? 'selected' : ''}>Setrika</option>
+            <option value="cuci-setrika" ${order.service_type === 'cuci-setrika' ? 'selected' : ''}>Cuci + Setrika</option>
+          </select>
+
+          <label for="edit-weight">Berat (KG):</label>
+          <input type="number" id="edit-weight" class="swal2-input" value="${order.weight_per_kg}" required>
+
+          <label for="edit-total-price">Total Harga:</label>
+          <input type="text" id="edit-total-price" class="swal2-input" value="${order.total_price}" readonly>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Simpan Perubahan',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+          const updatedName = document.getElementById('edit-name').value;
+          const updatedPhone = document.getElementById('edit-phone').value;
+          const updatedService = document.getElementById('edit-service').value;
+          const updatedWeight = parseFloat(document.getElementById('edit-weight').value);
+
+          if (!updatedName || !updatedPhone || !updatedService || isNaN(updatedWeight) || updatedWeight <= 0) {
+            Swal.showValidationMessage('Harap isi semua data dengan benar!');
+            return false;
+          }
+
+          return {
+            customer_name: updatedName,
+            phone_number: updatedPhone,
+            service_type: updatedService,
+            weight_per_kg: updatedWeight,
+            total_price: updatedWeight * servicePrices[updatedService],
+          };
+        },
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const updatedOrder = result.value;
+
+          const updateResponse = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify(updatedOrder),
+          });
+
+          if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`HTTP error! status: ${updateResponse.status}, message: ${errorText}`);
+          }
+
+          Swal.fire('Berhasil!', 'Data pesanan berhasil diperbarui.', 'success');
+          fetchOrders(); // Refresh tabel setelah pengeditan
+        }
+      });
+    } catch (error) {
+      console.error('Error saat mengedit data:', error);
+      Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
     }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire('Berhasil!', 'Pesanan berhasil diperbarui.', 'success');
-    }
-  });
-}
+  }
+});
+// Event delegation untuk tombol Delete
+document.querySelector('#order-table tbody').addEventListener('click', async function (event) {
+  if (event.target.classList.contains('delete-btn')) {
+    const row = event.target.closest('tr');
+    const orderId = row.dataset.id; // Ambil ID dari atribut data-id
 
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: 'Apakah Anda yakin ingin menghapus data pesanan ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const authToken = localStorage.getItem('authToken');
+          if (!authToken) {
+            Swal.fire('Error', 'Token tidak ditemukan. Silakan login ulang.', 'error');
+            return;
+          }
 
+          // Kirim permintaan DELETE ke backend
+          const response = await fetch(`https://apkclaundry.vercel.app/transaction-id?id=${orderId}`, {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
 
-function deleteOrder(index) {
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  orders.splice(index, 1);
-  localStorage.setItem('orders', JSON.stringify(orders));
-  displayOrders();
-  Swal.fire('Berhasil!', 'Pesanan berhasil dihapus.', 'success');
-}
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+          }
 
-document.addEventListener('DOMContentLoaded', displayOrders);
-// Ambil ID dari query parameter
-const urlParams = new URLSearchParams(window.location.search);
-const orderId = urlParams.get('id');
-
-// Gunakan orderId untuk menampilkan detail transaksi berdasarkan ID pesanan
+          // Jika berhasil, tampilkan pesan sukses
+          Swal.fire('Berhasil!', 'Data pesanan berhasil dihapus.', 'success');
+          fetchOrders(); // Refresh tabel setelah penghapusan
+        } catch (error) {
+          console.error('Error saat menghapus data:', error);
+          Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
+        }
+      }
+    });
+  }
+});
