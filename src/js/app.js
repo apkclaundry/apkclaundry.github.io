@@ -34,7 +34,7 @@ document.getElementById('save-btn').addEventListener('click', async function () 
   const service = document.getElementById('service-type').value;
   const weight = parseFloat(document.getElementById('weight').value);
   const totalPriceInput = document.getElementById('total-price').value.replace(/Rp|,/g, '');
-  const totalPrice = parseFloat(totalPriceInput) * 1000;
+  const totalPrice = parseFloat(totalPriceInput);
 
   if (!name || !phone || !service || isNaN(weight) || weight <= 0 || isNaN(totalPrice)) {
     Swal.fire('Error', 'Harap isi semua data dengan benar!', 'error');
@@ -47,37 +47,99 @@ document.getElementById('save-btn').addEventListener('click', async function () 
     return;
   }
 
-  const data = {
-    customer_name: name,
-    phone_number: phone,
-    service_type: service,
-    weight_per_kg: weight,
-    total_price: totalPrice,
-  };
+  Swal.fire({
+    title: 'Pilih Metode Pembayaran',
+    html: `
+      <select id="payment-method" class="swal2-input">
+        <option value="cash">Cash</option>
+        <option value="transfer">Transfer</option>
+        <option value="qris">QRIS</option>
+      </select>
+      <div id="qris-image-container" style="display: none; margin-top: 10px;">
+        <img id="qris-image" src="src/img/qris.png" alt="QRIS Code" style="width: 200px; height: auto;">
+      </div>
+      <div id="transfer-info" style="display: none; margin-top: 10px; font-weight: bold; font-size: 16px;">
+        Nomor Rekening: <span id="rekening-number">6755554506</span>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Bayar Sekarang',
+    cancelButtonText: 'Batal',
+    didOpen: () => {
+      const paymentMethodSelect = document.getElementById('payment-method');
+      const qrisImageContainer = document.getElementById('qris-image-container');
+      const transferInfo = document.getElementById('transfer-info');
 
-  try {
-    const response = await fetch('https://apkclaundry.vercel.app/transaction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      // Tambahkan event listener untuk mengubah tampilan QRIS atau Transfer
+      paymentMethodSelect.addEventListener('change', function () {
+        if (this.value === 'qris') {
+          qrisImageContainer.style.display = 'block';
+          transferInfo.style.display = 'none';
+        } else if (this.value === 'transfer') {
+          transferInfo.style.display = 'block';
+          qrisImageContainer.style.display = 'none';
+        } else {
+          qrisImageContainer.style.display = 'none';
+          transferInfo.style.display = 'none';
+        }
+      });
+    },
+    preConfirm: () => {
+      const paymentMethod = document.getElementById('payment-method').value;
+      if (!paymentMethod) {
+        Swal.showValidationMessage('Silakan pilih metode pembayaran!');
+        return false;
+      }
+      return paymentMethod;
     }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const paymentMethod = result.value;
 
-    Swal.fire('Berhasil!', 'Pesanan berhasil disimpan.', 'success').then(() => {
-      window.location.href = 'dashboard.html';
-    });
-  } catch (error) {
-    console.error('Error saat menyimpan data:', error);
-    Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
-  }
+      const data = {
+        customer_name: name,
+        phone_number: phone,
+        service_type: service,
+        weight_per_kg: weight,
+        total_price: totalPrice,
+        payment_method: paymentMethod, // Simpan metode pembayaran
+        isPaid: paymentMethod === "cash" ? true : false, // Jika Cash, otomatis Paid
+      };
+
+      try {
+        const response = await fetch('https://apkclaundry.vercel.app/transaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        Swal.fire({
+          title: 'Pembayaran Berhasil!',
+          text: `Pesanan berhasil disimpan dengan metode ${paymentMethod}`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = 'dashboard.html';
+        });
+
+      } catch (error) {
+        console.error('Error saat menyimpan data:', error);
+        Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
+      }
+    }
+  });
 });
+
+
 
 // Fungsi untuk mengambil data dari backend dan menampilkan di tabel
 async function fetchOrders() {
