@@ -59,32 +59,55 @@ async function fetchStocks() {
 }
 
 // Fungsi untuk menampilkan data ke tabel
+// Fungsi untuk menampilkan data stok dalam tabel (Desktop) dan kartu (Mobile)
 function displayStocks(stocks) {
   const stockTableBody = document.querySelector("#stock-table tbody");
+  const stockList = document.querySelector(".stock-list");
 
-  if (!stockTableBody) {
-    console.error("Tabel stok tidak ditemukan di DOM.");
-    return;
+  if (!stockTableBody || !stockList) {
+      console.error("Elemen tabel atau daftar stok tidak ditemukan di DOM.");
+      return;
   }
 
-  stockTableBody.innerHTML = ""; // Reset tabel
+  // Reset tabel dan daftar
+  stockTableBody.innerHTML = "";
+  stockList.innerHTML = "";
 
   stocks.forEach((stock) => {
-    // Menambahkan data ke tabel
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${stock.id}</td>
-      <td>${stock.item_name}</td>
-      <td>${stock.quantity}</td>
-      <td>${formatRupiah(stock.price)}</td>
-      <td class="actions">
-        <button class="edit" onclick="editStock('${stock.id}')">&#9998;</button>
-        <button class="delete" onclick="deleteStock('${stock.id}')">&#128465;</button>
-      </td>
-    `;
-    stockTableBody.appendChild(row);
+      // **Tampilan Tabel (Desktop)**
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td>${stock.id}</td>
+          <td>${stock.item_name}</td>
+          <td>${stock.quantity}</td>
+          <td>${formatRupiah(stock.price)}</td>
+          <td class="actions">
+              <button class="edit" onclick="editStock('${stock.id}')">&#9998;</button>
+              <button class="delete" onclick="deleteStock('${stock.id}')">&#128465;</button>
+          </td>
+      `;
+      stockTableBody.appendChild(row);
+
+      // **Tampilan Card (Mobile)**
+      const listItem = document.createElement("div");
+      listItem.classList.add("stock-item");
+      listItem.dataset.id = stock.id; // Menyimpan ID barang
+      listItem.innerHTML = `
+          <p><strong>ID Barang:</strong> ${stock.id}</p>
+          <p><strong>Nama Barang:</strong> ${stock.item_name}</p>
+          <p><strong>Stok:</strong> ${stock.quantity}</p>
+          <p><strong>Harga per Unit:</strong> ${formatRupiah(stock.price)}</p>
+          <div class="actions">
+              <button class="edit" onclick="editStock('${stock.id}')">Edit</button>
+              <button class="delete" onclick="deleteStock('${stock.id}')">Hapus</button>
+          </div>
+      `;
+      stockList.appendChild(listItem);
   });
 }
+
+
+
 
 // Fungsi untuk mengedit data stok
 async function editStock(id) {

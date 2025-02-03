@@ -228,3 +228,87 @@ nav {
     }
   }
   
+  /*responsive*/
+
+  /* Container utama */
+.stock-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* Tabel stok barang untuk desktop */
+#stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#stock-table th, #stock-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+#stock-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Sembunyikan tabel di mode mobile */
+@media (max-width: 768px) {
+  #stock-table {
+      display: none;
+  }
+}
+
+/* Versi Mobile (Card Style) */
+.stock-list {
+  display: none; /* Default: tidak ditampilkan di desktop */
+  margin-top: 20px;
+}
+
+.stock-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stock-item p {
+  margin: 5px 0;
+}
+
+.stock-item .actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.stock-item .actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.stock-item .actions .edit {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.stock-item .actions .delete {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Tampilkan daftar stok hanya di mode mobile */
+@media (max-width: 768px) {
+  .stock-list {
+      display: block;
+  }
+}
