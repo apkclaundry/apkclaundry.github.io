@@ -196,6 +196,8 @@ async function displayCustomers() {
     console.log('Customers:', customers); // Debugging: pastikan atribut ID terlihat dengan nama yang benar
 
     orderTableBody.innerHTML = "";
+    const orderList = document.querySelector('.order-list');
+    orderList.innerHTML = ""; // Clear the mobile view list
 
     customers.forEach(customer => {
         console.log('Customer:', customer); // Debugging
@@ -216,6 +218,27 @@ async function displayCustomers() {
             </td>
         `;
         orderTableBody.appendChild(row);
+
+        // Mobile view
+        const listItem = document.createElement("div");
+        listItem.classList.add("order-item");
+        listItem.dataset.id = customer.id;
+        listItem.innerHTML = `
+            <p><strong>ID:</strong> ${customer.id}</p>
+            <p><strong>Nama:</strong> ${customer.name}</p>
+            <p><strong>Nomor Telepon:</strong> ${customer.phone}</p>
+            <p><strong>Alamat:</strong> ${customer.address}</p>
+            <p><strong>Email:</strong> ${customer.email}</p>
+            <div class="actions">
+                <button class="btn btn-sm btn-warning" onclick="editCustomer('${customer.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCustomer('${customer.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        orderList.appendChild(listItem);
     });
 }
 
