@@ -33,10 +33,10 @@ document.getElementById('save-btn').addEventListener('click', async function () 
   const phone = document.getElementById('customer-phone').value;
   const service = document.getElementById('service-type').value;
   const weight = parseFloat(document.getElementById('weight').value);
-  const totalPriceInput = document.getElementById('total-price').value.replace(/Rp|,/g, '');
-  const totalPrice = parseFloat(totalPriceInput);
+  const totalPriceInput = document.getElementById('total-price').value.replace(/Rp|\./g, ''); // Hapus Rp dan titik
+  const totalPrice = Number(totalPriceInput) || 0; // Konversi ke angka dengan aman
 
-  if (!name || !phone || !service || isNaN(weight) || weight <= 0 || isNaN(totalPrice)) {
+  if (!name || !phone || !service || isNaN(weight) || weight <= 0 || isNaN(totalPrice) || totalPrice <= 0) {
     Swal.fire('Error', 'Harap isi semua data dengan benar!', 'error');
     return;
   }
@@ -70,7 +70,6 @@ document.getElementById('save-btn').addEventListener('click', async function () 
       const qrisImageContainer = document.getElementById('qris-image-container');
       const transferInfo = document.getElementById('transfer-info');
 
-      // Tambahkan event listener untuk mengubah tampilan QRIS atau Transfer
       paymentMethodSelect.addEventListener('change', function () {
         if (this.value === 'qris') {
           qrisImageContainer.style.display = 'block';
@@ -101,8 +100,8 @@ document.getElementById('save-btn').addEventListener('click', async function () 
         phone_number: phone,
         service_type: service,
         weight_per_kg: weight,
-        total_price: totalPrice,
-        payment_method: paymentMethod, // Simpan metode pembayaran
+        total_price: totalPrice, // Sekarang sudah benar
+        payment_method: paymentMethod,
       };
 
       try {
@@ -137,6 +136,7 @@ document.getElementById('save-btn').addEventListener('click', async function () 
     }
   });
 });
+
 
 
 let currentPage = 1;
