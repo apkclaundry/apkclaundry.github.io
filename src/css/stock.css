@@ -12,6 +12,11 @@
     padding: 0;
   }
   
+  #logoutBtn{
+    margin: 5px 0px 0px;
+    width: 100%;
+  }
+  
 .actions {
     display: flex;
     justify-content: space-around;

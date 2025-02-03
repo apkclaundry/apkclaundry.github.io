@@ -76,6 +76,12 @@ nav {
 .nav-links li a:hover {
   text-decoration: underline;
 }
+
+#logoutBtn{
+  margin: 5px 0px 0px;
+  width: 100%;
+}
+
 .burger {
   display: none;
   background: none;
