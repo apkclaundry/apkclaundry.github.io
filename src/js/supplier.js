@@ -204,6 +204,8 @@ async function displaySuppliers() {
   const suppliers = await getSuppliers();
 
   orderTableBody.innerHTML = "";
+  const supplierList = document.querySelector(".supplier-list");
+  supplierList.innerHTML = "";
 
   suppliers.forEach(supplier => {
     const row = document.createElement("tr");
@@ -224,6 +226,26 @@ async function displaySuppliers() {
       </td>
     `;
     orderTableBody.appendChild(row);
+
+    const card = document.createElement("div");
+    card.classList.add("supplier-item");
+    card.innerHTML = `
+      <p><strong>ID:</strong> ${supplier.id}</p>
+      <p><strong>Nama:</strong> ${supplier.supplier_name}</p>
+      <p><strong>Nomor Telepon:</strong> ${supplier.phone_number}</p>
+      <p><strong>Alamat:</strong> ${supplier.address}</p>
+      <p><strong>Email:</strong> ${supplier.email}</p>
+      <p><strong>Produk yang Disuplai:</strong> ${supplier.supplied_products.join(", ")}</p>
+      <div class="actions">
+        <button class="btn btn-sm btn-warning" onclick="editSupplier('${supplier.id}')">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `;
+    supplierList.appendChild(card);
   });
 }
 

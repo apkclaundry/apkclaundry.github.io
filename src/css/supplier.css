@@ -444,4 +444,27 @@ body {
       padding: 6px;
     }
   }
-  
+
+.supplier-item {
+  display: none;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.supplier-item .actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    display: none;
+  }
+
+  .supplier-item {
+    display: block;
+  }
+}
