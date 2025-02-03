@@ -339,7 +339,7 @@ table#order-table td {
 }
 
 .pagination-btn {
-  background-color: #7a7a7a;
+  background-color: #bebebe;
   color: rgb(0, 0, 0);
   border: none;
   padding: 8px 12px;
@@ -358,7 +358,7 @@ table#order-table td {
 }
 
 .pagination-btn.active {
-  background-color: #bebebe;
+  background-color: #7a7a7a;
 }
 
 
