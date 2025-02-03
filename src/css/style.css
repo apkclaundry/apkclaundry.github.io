@@ -302,10 +302,10 @@ table#order-table td {
   margin: 0;
 }
 
-.nav-links a {
+.nav-links li a {
+  color: white;
   text-decoration: none;
-  color: #333;
-  font-weight: bold;
+  font-size: 16px;
 }
 
 /* Mobile styles */
