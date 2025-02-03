@@ -329,6 +329,36 @@ table#order-table td {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/*Pagination*/
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-btn {
+  background-color: #7a7a7a;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 8px 12px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination-btn:hover {
+  background-color: #0056b3;
+}
+
+.pagination-btn:disabled {
+
+  cursor: not-allowed;
+}
+
+.pagination-btn.active {
+  background-color: #bebebe;
+}
+
 
 /* Responsif: Ubah tabel menjadi tampilan list pada layar kecil */
 @media screen and (max-width: 768px) {

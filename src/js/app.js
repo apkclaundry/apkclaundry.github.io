@@ -103,7 +103,6 @@ document.getElementById('save-btn').addEventListener('click', async function () 
         weight_per_kg: weight,
         total_price: totalPrice,
         payment_method: paymentMethod, // Simpan metode pembayaran
-        isPaid: paymentMethod === "cash" ? true : false, // Jika Cash, otomatis Paid
       };
 
       try {
@@ -140,8 +139,9 @@ document.getElementById('save-btn').addEventListener('click', async function () 
 });
 
 
+let currentPage = 1;
+const rowsPerPage = 5; // Ubah jumlah item per halaman di sini
 
-// Fungsi untuk mengambil data dari backend dan menampilkan di tabel
 async function fetchOrders() {
   try {
     const authToken = localStorage.getItem('authToken');
@@ -163,62 +163,125 @@ async function fetchOrders() {
     }
 
     const orders = await response.json();
-
-    const tableBody = document.querySelector('#order-table tbody');
-    const orderList = document.querySelector('.order-list');
-    tableBody.innerHTML = '';
-    orderList.innerHTML = '';
-
-    orders.forEach(order => {
-      // Tabel untuk desktop
-      const row = document.createElement('tr');
-      row.dataset.id = order.id;
-      row.innerHTML = `
-        <td>${order.customer_name}</td>
-        <td>${order.phone_number}</td>
-        <td>${order.service_type}</td>
-        <td>${order.weight_per_kg}</td>
-        <td>Rp${order.total_price.toLocaleString('id-ID')}</td>
-        <td>${order.transaction_date || '-'}</td>
-        <td style="color: ${order.payment_Method ? 'green' : 'red'}; font-weight: bold;">${order.payment_Method ? 'Paid' : 'Not Paid'}</td>
-        <td>
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-
-      // Daftar untuk mobile
-      const listItem = document.createElement("div");
-      listItem.classList.add("order-item");
-      listItem.dataset.id = order.id; // Tambahkan ID pada data-id
-      listItem.innerHTML = `
-        <p><strong>Nama Pelanggan:</strong> ${order.customer_name}</p>
-        <p><strong>Nomor Telepon:</strong> ${order.phone_number}</p>
-        <p><strong>Jenis Layanan:</strong> ${order.service_type}</p>
-        <p><strong>Berat (KG):</strong> ${order.weight_per_kg}</p>
-        <p><strong>Total Harga:</strong> Rp${order.total_price.toLocaleString("id-ID")}</p>
-        <p><strong>Tanggal:</strong> ${order.transaction_date || "-"}</p>
-        <p style="color: ${order.isPaid ? "green" : "red"}; font-weight: bold;"><strong>Payment Status:</strong> ${
-          order.isPaid ? "Paid" : "Not Paid"
-        }</p>
-        <div class="actions">
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </div>
-      `;
-      orderList.appendChild(listItem);
-      
-    });
+    displayOrders(orders, currentPage);
+    setupPagination(orders);
   } catch (error) {
     console.error('Error saat mengambil data:', error);
     Swal.fire('Error', `Terjadi kesalahan: ${error.message}`, 'error');
   }
 }
 
+function displayOrders(orders, page) {
+  const tableBody = document.querySelector('#order-table tbody');
+  const orderList = document.querySelector('.order-list');
+  tableBody.innerHTML = '';
+  orderList.innerHTML = '';
 
-// Panggil fetchOrders saat halaman dimuat
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const paginatedOrders = orders.slice(start, end);
+
+  paginatedOrders.forEach(order => {
+
+
+    if (order.payment_method === 'qris' || order.payment_method === 'transfer') {
+
+
+    }
+
+    // **Versi Desktop (Tabel)**
+    const row = document.createElement('tr');
+    row.dataset.id = order.id;
+    row.innerHTML = `
+      <td>${order.customer_name}</td>
+      <td>${order.phone_number}</td>
+      <td>${order.service_type}</td>
+      <td>${order.weight_per_kg}</td>
+      <td>Rp${order.total_price.toLocaleString('id-ID')}</td>
+      <td>${order.transaction_date || '-'}</td>
+      <td>${order.payment_method || '-'}</td>
+      <td>
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+
+    // **Versi Mobile (Card)**
+    const listItem = document.createElement("div");
+    listItem.classList.add("order-item");
+    listItem.dataset.id = order.id;
+    listItem.innerHTML = `
+      <p><strong>Nama Pelanggan:</strong> ${order.customer_name}</p>
+      <p><strong>Nomor Telepon:</strong> ${order.phone_number}</p>
+      <p><strong>Jenis Layanan:</strong> ${order.service_type}</p>
+      <p><strong>Berat (KG):</strong> ${order.weight_per_kg}</p>
+      <p><strong>Total Harga:</strong> Rp${order.total_price.toLocaleString("id-ID")}</p>
+      <p><strong>Metode Pembayaran:</strong> ${order.payment_method || "-"}</p>
+
+      </p>
+      <div class="actions">
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+      </div>
+    `;
+    orderList.appendChild(listItem);
+  });
+}
+
+function setupPagination(orders) {
+  const paginationContainer = document.getElementById('pagination');
+  paginationContainer.innerHTML = '';
+
+  const pageCount = Math.ceil(orders.length / rowsPerPage);
+
+  const prevButton = document.createElement('button');
+  prevButton.innerText = 'Previous';
+  prevButton.classList.add('pagination-btn');
+  prevButton.disabled = currentPage === 1;
+  prevButton.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      displayOrders(orders, currentPage);
+      setupPagination(orders);
+    }
+  });
+
+  paginationContainer.appendChild(prevButton);
+
+  for (let i = 1; i <= pageCount; i++) {
+    const pageButton = document.createElement('button');
+    pageButton.innerText = i;
+    pageButton.classList.add('pagination-btn');
+    if (currentPage === i) {
+      pageButton.classList.add('active');
+    }
+    pageButton.addEventListener('click', () => {
+      currentPage = i;
+      displayOrders(orders, currentPage);
+      setupPagination(orders);
+    });
+    paginationContainer.appendChild(pageButton);
+  }
+
+  const nextButton = document.createElement('button');
+  nextButton.innerText = 'Next';
+  nextButton.classList.add('pagination-btn');
+  nextButton.disabled = currentPage === pageCount;
+  nextButton.addEventListener('click', () => {
+    if (currentPage < pageCount) {
+      currentPage++;
+      displayOrders(orders, currentPage);
+      setupPagination(orders);
+    }
+  });
+
+  paginationContainer.appendChild(nextButton);
+}
+
+// **Panggil fetchOrders saat halaman dimuat**
 document.addEventListener('DOMContentLoaded', fetchOrders);
+
 
 // Event delegation untuk tombol Edit
 document.querySelector('#order-table tbody').addEventListener('click', async function (event) {
