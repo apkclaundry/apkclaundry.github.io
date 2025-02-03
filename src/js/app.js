@@ -180,7 +180,7 @@ async function fetchOrders() {
         <td>${order.weight_per_kg}</td>
         <td>Rp${order.total_price.toLocaleString('id-ID')}</td>
         <td>${order.transaction_date || '-'}</td>
-        <td style="color: ${order.isPaid ? 'green' : 'red'}; font-weight: bold;">${order.isPaid ? 'Paid' : 'Not Paid'}</td>
+        <td style="color: ${order.payment_Method ? 'green' : 'red'}; font-weight: bold;">${order.payment_Method ? 'Paid' : 'Not Paid'}</td>
         <td>
           <button class="edit-btn">Edit</button>
           <button class="delete-btn">Delete</button>
