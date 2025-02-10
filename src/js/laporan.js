@@ -324,10 +324,27 @@ document.getElementById("filterPeriod").addEventListener("change", async (event)
   const selectedValue = event.target.options[event.target.selectedIndex].text;
   if (selectedValue === "Gaji") {
     await renderTableSalary();
-  } else if (selectedValue === "Laundry") {
-    await renderTableLaundry(); // Memastikan Laundry tetap berfungsi
+  } else {
+    await renderTableLaundry();
   }
+
+  toggleMobileView(selectedValue);
 });
+
+
+// Pastikan toggle berjalan setelah data dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  toggleMobileView(defaultOption);
+});
+
+// Pastikan juga dropdown bekerja saat berubah
+document.getElementById("filterPeriod").addEventListener("change", (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  toggleMobileView(selectedValue);
+});
+
+
 
 // Inisialisasi pertama kali
 document.addEventListener("DOMContentLoaded", () => {
@@ -373,6 +390,126 @@ document.getElementById("filterPeriod").addEventListener("change", async (event)
 
 // Inisialisasi pertama kali
 renderTableLaundry();
+
+//mobile table version
+// Fungsi untuk menampilkan/menghilangkan list atau tabel berdasarkan ukuran layar
+function toggleMobileView(selectedOption) {
+  const tableContainer = document.querySelector(".table-container");
+  const mobileList = document.querySelector(".mobile-list");
+
+  if (!tableContainer || !mobileList) {
+    console.error("Element table-container atau mobile-list tidak ditemukan.");
+    return;
+  }
+
+  if (window.innerWidth <= 768) {
+    tableContainer.style.display = "none"; // Sembunyikan tabel di mobile
+    mobileList.style.display = "block"; // Tampilkan list/card
+  } else {
+    tableContainer.style.display = "block"; // Tampilkan tabel di desktop
+    mobileList.style.display = "none"; // Sembunyikan list/card di desktop
+  }
+}
+
+// Fungsi untuk membuat tampilan mobile dalam format list/card
+function renderMobileList(data, type) {
+  const mobileListContainer = document.getElementById("mobileReportList");
+  mobileListContainer.innerHTML = ""; // Kosongkan kontainer sebelum isi ulang
+
+  if (type === "Laundry") {
+    data.forEach(({ customer, service, date, transactions, totalAmount }) => {
+      const card = `
+        <div class="card mb-2 p-3 shadow-sm">
+          <p><strong>Nama Pelanggan:</strong> ${customer}</p>
+          <p><strong>Layanan:</strong> ${service}</p>
+          <p><strong>Tanggal:</strong> ${date}</p>
+          <p><strong>Jumlah Transaksi:</strong> ${transactions}</p>
+          <p><strong>Total Pendapatan:</strong> Rp ${totalAmount.toLocaleString("id-ID")}</p>
+        </div>
+      `;
+      mobileListContainer.innerHTML += card;
+    });
+  } else if (type === "Gaji") {
+    data.forEach(({ username, role, hired_date, salary_date, salary }) => {
+      const card = `
+        <div class="card mb-2 p-3 shadow-sm">
+          <p><strong>Nama Karyawan:</strong> ${username}</p>
+          <p><strong>Role:</strong> ${role}</p>
+          <p><strong>Tanggal Rekrutmen:</strong> ${hired_date}</p>
+          <p><strong>Tanggal Gajian:</strong> ${salary_date}</p>
+          <p><strong>Gaji Bulan Ini:</strong> Rp ${salary.toLocaleString("id-ID")}</p>
+        </div>
+      `;
+      mobileListContainer.innerHTML += card;
+    });
+  }
+}
+
+// Modifikasi renderTable agar memanggil renderMobileList()
+async function renderTableLaundry() {
+  const groupedData = await groupTransactionsByCustomer();
+  const tableBody = document.getElementById("revenueTableBody");
+  tableBody.innerHTML = "";
+
+  groupedData.forEach(({ customer, service, date, transactions, totalAmount }) => {
+    const row = `
+      <tr>
+        <td>${customer}</td>
+        <td>${service}</td>
+        <td>${date}</td>
+        <td>${transactions}</td>
+        <td>Rp ${totalAmount.toLocaleString("id-ID")}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+
+  renderMobileList(groupedData, "Laundry");
+  toggleMobileView("Laundry"); // Pastikan tampilan mobile diperbarui
+}
+
+async function renderTableSalary() {
+  const salaries = await fetchEmployeeSalaries();
+  const tableBody = document.getElementById("revenueTableBody");
+  tableBody.innerHTML = "";
+
+  salaries.forEach(({ username, role, hired_date, salary_date, salary }) => {
+    const row = `
+      <tr>
+        <td>${username}</td>
+        <td>${role}</td>
+        <td>${hired_date}</td>
+        <td>${salary_date}</td>
+        <td>Rp ${salary.toLocaleString("id-ID")}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+
+  renderMobileList(salaries, "Gaji");
+  toggleMobileView("Gaji"); // Pastikan tampilan mobile diperbarui
+}
+
+// Pastikan fungsi ini dipanggil saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  toggleMobileView(defaultOption);
+});
+
+// Event Listener untuk menangani dropdown perubahan data
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  if (selectedValue === "Gaji") {
+    await renderTableSalary();
+  } else {
+    await renderTableLaundry();
+  }
+  toggleMobileView(selectedValue);
+});
+
+// Perbaiki renderTable agar juga memanggil renderMobileList()
+
+
 
 
 

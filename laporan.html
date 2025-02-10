@@ -48,6 +48,25 @@
       validateLogin();
     });
   </script>
+  <style>
+    /* Sembunyikan tabel di tampilan mobile */
+@media screen and (max-width: 768px) {
+  .table-container {
+    display: none;
+  }
+  .mobile-list {
+    display: block;
+  }
+}
+
+/* Sembunyikan list di tampilan desktop */
+@media screen and (min-width: 769px) {
+  .mobile-list {
+    display: none;
+  }
+}
+
+  </style>
 </head>
 <body>
   <header>
@@ -137,6 +156,20 @@
               <!-- Data dynamically added by JavaScript -->
             </tbody>
           </table>
+        </div>
+        <!-- Versi Mobile (List/Card) -->
+        <div class="table-container">
+          <table id="revenueTable">
+             <thead>
+                <tr id="revenueTableHead"></tr>
+             </thead>
+             <tbody id="revenueTableBody"></tbody>
+          </table>
+       </div>
+       
+       <div id="mobileReportList" class="mobile-list"></div>
+       
+        <!-- Data akan dimuat oleh JavaScript -->
         </div>
       </div>
         

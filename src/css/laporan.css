@@ -154,3 +154,30 @@ nav {
     }
   }
   
+
+/* Membuat tabel bisa di-scroll di layar kecil */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Versi mobile: Sembunyikan tabel, tampilkan daftar */
+@media screen and (max-width: 768px) {
+  .table-container {
+    display: none;
+  }
+  .mobile-list {
+    display: block;
+  }
+}
+
+/* Versi desktop: Sembunyikan daftar, tampilkan tabel */
+@media screen and (min-width: 769px) {
+  .table-container {
+    display: block;
+  }
+  .mobile-list {
+    display: none;
+  }
+}
+
