@@ -72,6 +72,13 @@ function displayEmployees(employees) {
   employeeList.innerHTML = ""; // Reset list
 
   employees.forEach((employee) => {
+    // Format salary ke format Rupiah
+    const formattedSalary = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0
+    }).format(employee.salary);
+
     // Menambahkan data ke tabel
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -81,7 +88,10 @@ function displayEmployees(employees) {
       <td>${employee.phone}</td>
       <td>${employee.address}</td>
       <td>${new Date(employee.hired_date).toLocaleDateString()}</td>
+      <td>${formattedSalary}</td>
+      <td>${employee.salary_date}</td>
       <td class="actions">
+        <button class="salary" onclick="addSalary('${employee.id}')">💰</button>
         <button class="edit" onclick="editEmployee('${employee.id}')">&#9998;</button>
         <button class="delete" onclick="deleteEmployee('${employee.id}')">&#128465;</button>
       </td>
@@ -95,7 +105,10 @@ function displayEmployees(employees) {
       <p><strong>ID Karyawan:</strong> ${employee.id}</p>
       <p><strong>Nama Karyawan:</strong> ${employee.username}</p>
       <p><strong>Role:</strong> ${employee.role}</p>
+      <p><strong>Tanggal Rekrutment :</strong> ${new Date(employee.hired_date).toLocaleDateString()}</p>     
+      <p><strong>Gaji bulan ini:</strong> ${formattedSalary}</p>
       <div class="actions">
+        <button class="salary" onclick="addSalary('${employee.id}')">💰</button>
         <button class="edit" onclick="editEmployee('${employee.id}')">&#9998;</button>
         <button class="delete" onclick="deleteEmployee('${employee.id}')">&#128465;</button>
       </div>
@@ -103,6 +116,87 @@ function displayEmployees(employees) {
     employeeList.appendChild(listItem);
   });
 }
+
+// Fungsi untuk menambahkan atau mengupdate salary karyawan
+async function addSalary(id) {
+  const token = getAuthToken();
+
+  try {
+    const getResponse = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!getResponse.ok) {
+      throw new Error("Gagal mengambil data karyawan.");
+    }
+
+    const employee = await getResponse.json();
+    localStorage.setItem("employeeData", JSON.stringify(employee));
+
+    const { value: salary } = await Swal.fire({
+      title: "Masukkan Gaji Karyawan",
+      input: "number",
+      inputLabel: "Gaji (Rp)",
+      inputPlaceholder: "Masukkan jumlah gaji",
+      showCancelButton: true,
+      confirmButtonText: "Simpan",
+      cancelButtonText: "Batal",
+      inputValidator: (value) => {
+        if (!value || value <= 0) {
+          return "Gaji harus lebih dari 0!";
+        }
+      },
+    });
+
+    if (salary) {
+      const storedEmployee = JSON.parse(localStorage.getItem("employeeData"));
+      const updatedData = {
+        username: storedEmployee.username,
+        role: storedEmployee.role,
+        phone: storedEmployee.phone,
+        address: storedEmployee.address,
+        salary: Number(salary),
+        salary_date: new Date().toISOString() // Menambahkan tanggal update salary dalam format yang benar
+      };
+
+      const response = await fetch(`https://apkclaundry.vercel.app/employee-id?id=${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        Swal.fire({
+          title: "Berhasil!",
+          text: result.message,
+          icon: "success",
+          confirmButtonText: "OK"
+        }).then(() => {
+          window.location.href = "karyawan.html"; // Redirect ke halaman karyawan setelah update
+        });
+      } else {
+        throw new Error(result.message || "Gagal memperbarui gaji.");
+      }
+    }
+  } catch (error) {
+    console.error("Error updating salary:", error);
+    Swal.fire("Error!", "Gagal memperbarui gaji.", "error");
+  }
+}
+
+
+// Event listener untuk memuat data
+document.addEventListener("DOMContentLoaded", () => {
+  fetchEmployees(); // Ambil data karyawan saat halaman dimuat
+});
 
 // Fungsi untuk mengedit data karyawan
 async function editEmployee(id) {
@@ -292,6 +386,6 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchEmployees(); // Ambil data karyawan saat halaman dimuat
 });
 
-
+window.addSalary = addSalary;
 window.editEmployee = editEmployee;
 window.deleteEmployee = deleteEmployee;
