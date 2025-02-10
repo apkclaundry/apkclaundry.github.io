@@ -104,7 +104,212 @@ function renderTable(period) {
   });
 }
 
-//laporan
+//card
+async function calculateTotals() {
+  const transactions = await fetchTransactions();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset jam agar hanya menghitung tanggal
+
+  let dailyTotal = 0;
+  let weeklyTotal = 0;
+  let monthlyTotal = 0;
+
+  transactions.forEach(({ date, amount }) => {
+    // Konversi "10/02/2025" menjadi format Date yang valid
+    const [day, month, year] = date.split("/").map(num => parseInt(num, 10));
+    const transactionDate = new Date(year, month - 1, day);
+    transactionDate.setHours(0, 0, 0, 0); // Reset jam agar perhitungan akurat
+
+    // Hitung selisih hari
+    const diffInDays = Math.floor((today - transactionDate) / (1000 * 60 * 60 * 24));
+
+    // Perbaiki logika perbandingan
+    if (diffInDays === 0) {
+      dailyTotal += amount; // Pendapatan hari ini
+    }
+    if (diffInDays >= 0 && diffInDays < 7) {
+      weeklyTotal += amount; // Pendapatan 7 hari terakhir
+    }
+    if (diffInDays >= 0 && diffInDays < 30) {
+      monthlyTotal += amount; // Pendapatan 30 hari terakhir
+    }
+  });
+
+  // Tampilkan hasil di card
+  document.getElementById("dailyTotal").textContent = `Rp ${dailyTotal.toLocaleString("id-ID")}`;
+  document.getElementById("weeklyTotal").textContent = `Rp ${weeklyTotal.toLocaleString("id-ID")}`;
+  document.getElementById("monthlyTotal").textContent = `Rp ${monthlyTotal.toLocaleString("id-ID")}`;
+}
+
+// Jalankan perhitungan setelah data diambil dari API
+calculateTotals();
+
+//merubah tabel berdasarkan dropdown
+function updateTableHeaders(selectedOption) {
+  const headers = {
+    "Laundry": ["Nama Pelanggan", "Layanan", "Tanggal", "Jumlah Transaksi", "Total Pendapatan (Rp)"],
+    "Gaji": ["Nama Karyawan", "Role", "Tanggal Rekrutmen", "Tanggal Gajian", "Gaji Bulan Ini", ],
+  };
+
+  const selectedHeaders = headers[selectedOption] || headers["Laundry"]; // Default ke Laundry jika tidak ditemukan
+  const tableHeaderRow = document.querySelector("#revenueTableBody").closest("table").querySelector("thead tr");
+
+  if (tableHeaderRow) {
+    tableHeaderRow.innerHTML = `
+      <th>${selectedHeaders[0]}</th>
+      <th>${selectedHeaders[1]}</th>
+      <th>${selectedHeaders[2]}</th>
+      <th>${selectedHeaders[3]}</th>
+      <th>${selectedHeaders[4]}</th>
+    `;
+  }
+}
+
+//lihat salary 1 tahun terakhir
+async function fetchSalaryHistory(username) {
+  try {
+    // Ambil token dari localStorage
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("Token tidak ditemukan, pastikan pengguna sudah login.");
+      return [];
+    }
+
+    // Request ke API Employee dengan Authorization Token
+    const response = await fetch("https://apkclaundry.vercel.app/employee", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gagal mengambil data, status: ${response.status}`);
+    }
+
+    const employees = await response.json();
+    const employee = employees.find(emp => emp.username === username);
+
+    if (!employee) {
+      return [];
+    }
+
+    // Simulasi data gaji bulan sebelumnya dalam tahun ini (jika backend belum support)
+    const salaryHistory = [];
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // Januari = 1
+
+    for (let month = 1; month < currentMonth; month++) {
+      salaryHistory.push({
+        month: new Date(currentDate.getFullYear(), month - 1, 1).toLocaleString("id-ID", { month: "long" }),
+        salary: employee.salary
+      });
+    }
+
+    return salaryHistory;
+  } catch (error) {
+    console.error("Gagal mengambil riwayat gaji:", error);
+    return [];
+  }
+}
+
+async function showSalaryHistory(username) {
+  const history = await fetchSalaryHistory(username);
+  
+  if (history.length === 0) {
+    Swal.fire("Tidak Ada Data", `Tidak ditemukan riwayat gaji untuk ${username} dalam tahun ini.`, "info");
+    return;
+  }
+
+  let historyTable = `
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bulan</th>
+          <th>Gaji (Rp)</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  history.forEach(({ month, salary }) => {
+    historyTable += `
+      <tr>
+        <td>${month}</td>
+        <td>Rp ${salary.toLocaleString("id-ID")}</td>
+      </tr>
+    `;
+  });
+
+  historyTable += `</tbody></table>`;
+
+  Swal.fire({
+    title: `Riwayat Gaji ${username}`,
+    html: historyTable,
+    icon: "info",
+    confirmButtonText: "Tutup"
+  });
+}
+
+async function renderTableSalary() {
+  const salaries = await fetchEmployeeSalaries();
+  const tableBody = document.getElementById("revenueTableBody");
+  tableBody.innerHTML = "";
+
+  salaries.forEach(({ username, role, hired_date, salary_date, salary }) => {
+    const row = `
+      <tr>
+        <td>${username}</td>
+        <td>${role}</td>
+        <td>${hired_date}</td>
+        <td>${salary_date}</td>
+        <td>Rp ${salary.toLocaleString("id-ID")}</td>
+        <td>
+          <button class="btn btn-info btn-sm" onclick="showSalaryHistory('${username}')">
+            🔍
+          </button>
+        </td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+}
+
+// Event Listener Dropdown untuk Update Kolom Aksi
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  updateTableHeaders(selectedValue);
+  if (selectedValue === "Gaji") {
+    await renderTableSalary();
+  } else {
+    await renderTableLaundry();
+  }
+});
+
+// Inisialisasi pertama kali
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  updateTableHeaders(defaultOption);
+  if (defaultOption === "Gaji") {
+    renderTableSalary();
+  } else {
+    renderTableLaundry();
+  }
+});
+
+
+// Event Listener untuk perubahan dropdown
+document.getElementById("filterPeriod").addEventListener("change", (event) => {
+  updateTableHeaders(event.target.options[event.target.selectedIndex].text);
+});
+
+// Inisialisasi pertama kali
+document.addEventListener("DOMContentLoaded", () => {
+  updateTableHeaders(document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text);
+});
+
+//tabel dropdown laporan
 async function fetchTransactions() {
   try {
     // Ambil token dari localStorage
@@ -190,48 +395,105 @@ async function renderTableLaundry() {
   });
 }
 
-//card
-async function calculateTotals() {
-  const transactions = await fetchTransactions();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Reset jam agar hanya menghitung tanggal
-
-  let dailyTotal = 0;
-  let weeklyTotal = 0;
-  let monthlyTotal = 0;
-
-  transactions.forEach(({ date, amount }) => {
-    // Konversi "10/02/2025" menjadi format Date yang valid
-    const [day, month, year] = date.split("/").map(num => parseInt(num, 10));
-    const transactionDate = new Date(year, month - 1, day);
-    transactionDate.setHours(0, 0, 0, 0); // Reset jam agar perhitungan akurat
-
-    // Hitung selisih hari
-    const diffInDays = Math.floor((today - transactionDate) / (1000 * 60 * 60 * 24));
-
-    // Perbaiki logika perbandingan
-    if (diffInDays === 0) {
-      dailyTotal += amount; // Pendapatan hari ini
+//tabel dropdown Gaji
+async function fetchEmployeeSalaries() {
+  try {
+    // Ambil token dari localStorage
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("Token tidak ditemukan, pastikan pengguna sudah login.");
+      return [];
     }
-    if (diffInDays >= 0 && diffInDays < 7) {
-      weeklyTotal += amount; // Pendapatan 7 hari terakhir
-    }
-    if (diffInDays >= 0 && diffInDays < 30) {
-      monthlyTotal += amount; // Pendapatan 30 hari terakhir
-    }
-  });
 
-  // Tampilkan hasil di card
-  document.getElementById("dailyTotal").textContent = `Rp ${dailyTotal.toLocaleString("id-ID")}`;
-  document.getElementById("weeklyTotal").textContent = `Rp ${weeklyTotal.toLocaleString("id-ID")}`;
-  document.getElementById("monthlyTotal").textContent = `Rp ${monthlyTotal.toLocaleString("id-ID")}`;
+    // Request ke API Employee dengan Authorization Token
+    const response = await fetch("https://apkclaundry.vercel.app/employee", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` // Tambahkan token di sini
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gagal mengambil data, status: ${response.status}`);
+    }
+
+    const employees = await response.json();
+
+    return employees.map(employee => ({
+      username: employee.username || "Tidak Diketahui",
+      role: employee.role || "Tidak Diketahui",
+      hired_date: employee.hired_date || "Tanggal Tidak Valid",
+      salary_date: employee.salary_date || "Tanggal Tidak Valid",
+      salary: parseInt(employee.salary) || 0
+    }));
+  } catch (error) {
+    console.error("Gagal mengambil data gaji:", error);
+    return [];
+  }
 }
 
-// Jalankan perhitungan setelah data diambil dari API
-calculateTotals();
+async function renderTableSalary() {
+  const salaries = await fetchEmployeeSalaries();
+  const tableBody = document.getElementById("revenueTableBody");
+  tableBody.innerHTML = "";
 
+  salaries.forEach(({ username, role, hired_date, salary_date, salary }) => {
+    const row = `
+      <tr>
+        <td>${username}</td>
+        <td>${role}</td>
+        <td>${hired_date}</td>
+        <td>${salary_date}</td>
+        <td>Rp ${salary.toLocaleString("id-ID")}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+}
 
+// Event Listener untuk Dropdown
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  if (selectedValue === "Gaji") {
+    await renderTableSalary();
+  } else if (selectedValue === "Laundry") {
+    await renderTableLaundry(); // Memastikan Laundry tetap berfungsi
+  }
+});
 
+// Inisialisasi pertama kali
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  if (defaultOption === "Gaji") {
+    renderTableSalary();
+  } else {
+    renderTableLaundry();
+  }
+});
+
+//hilangkan card ketika dropdown tabel Gaji di pilih
+function toggleCardsVisibility(selectedOption) {
+  const cardsContainer = document.querySelector(".row.mb-5"); // Ambil container card
+  
+  if (selectedOption === "Gaji") {
+    cardsContainer.style.display = "none"; // Sembunyikan jika pilih Gaji
+  } else {
+    cardsContainer.style.display = "flex"; // Tampilkan jika pilih Laundry atau lainnya
+  }
+}
+
+// Update event listener dropdown untuk menyembunyikan card
+document.getElementById("filterPeriod").addEventListener("change", (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  toggleCardsVisibility(selectedValue);
+});
+
+// Inisialisasi pertama kali saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  toggleCardsVisibility(defaultOption);
+});
 
 
 // Event Listener untuk Dropdown
