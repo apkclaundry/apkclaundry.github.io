@@ -425,6 +425,103 @@ document.querySelector('#order-table tbody').addEventListener('click', async fun
   }
 });
 
+
+// Fungsi untuk mengambil daftar pelanggan dari API dan mengisi dropdown
+async function fetchCustomers() {
+  try {
+      const response = await fetch("https://apkclaundry.vercel.app/customers-name");
+      if (!response.ok) throw new Error("Gagal mengambil data pelanggan.");
+
+      const customers = await response.json();
+      const customerSelect = document.getElementById("customer-name");
+
+      // Reset dropdown
+      customerSelect.innerHTML = `<option value="" disabled selected>Pilih Nama Pelanggan</option>`;
+
+      customers.forEach(customer => {
+          const option = document.createElement("option");
+          option.value = customer.name;
+          option.textContent = customer.name;
+          customerSelect.appendChild(option);
+      });
+  } catch (error) {
+      console.error("Error fetching customers:", error);
+  }
+}
+
+// Pastikan fungsi hanya dipanggil sekali
+document.addEventListener("DOMContentLoaded", fetchCustomers);
+
+async function loadCustomerData() {
+  try {
+      const token = localStorage.getItem("authToken"); // Ambil token dari localStorage
+      if (!token) {
+          console.error("Token tidak ditemukan! Pastikan sudah login.");
+          return;
+      }
+
+      const response = await fetch("https://apkclaundry.vercel.app/customers-name", {
+          method: "GET",
+          headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+          }
+      });
+
+      if (!response.ok) throw new Error(`Gagal mengambil data pelanggan. Status: ${response.status}`);
+
+      const customers = await response.json();
+
+      // Simpan data pelanggan ke localStorage
+      localStorage.setItem("customerData", JSON.stringify(customers));
+
+      console.log("Data pelanggan berhasil diambil dan disimpan:", customers);
+      populateCustomerDropdown();
+  } catch (error) {
+      console.error("Error fetching customers:", error);
+  }
+}
+
+function populateCustomerDropdown() {
+  const customerSelect = document.getElementById("customer-name");
+
+  if (!customerSelect) {
+      console.error("Dropdown pelanggan tidak ditemukan di DOM!");
+      return;
+  }
+
+  // Ambil data pelanggan dari localStorage
+  const storedCustomers = localStorage.getItem("customerData");
+
+  if (storedCustomers) {
+      const customers = JSON.parse(storedCustomers);
+      console.log("Data pelanggan dari localStorage:", customers);
+
+      // Reset dropdown sebelum mengisi ulang
+      customerSelect.innerHTML = `<option value="" disabled selected>Pilih Nama Pelanggan</option>`;
+
+      customers.forEach(customer => {
+          const option = document.createElement("option");
+          option.value = customer.name;
+          option.textContent = customer.name;
+          customerSelect.appendChild(option);
+      });
+
+      console.log("Dropdown pelanggan berhasil diisi!");
+  } else {
+      console.warn("Data pelanggan tidak ditemukan di localStorage.");
+  }
+}
+
+// Jalankan saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  loadCustomerData();
+  populateCustomerDropdown();
+});
+
+
+
+
 // Event delegation untuk daftar mobile
 document.querySelector(".order-list").addEventListener("click", async function (event) {
   const target = event.target;

@@ -75,16 +75,13 @@
     <main>
       <!-- Formulir Pesanan -->
       <form id="order-form">
-        <div class="form-group">
-          <label for="customer-name">Nama Pelanggan</label>
-          <input
-            type="text"
-            id="customer-name"
-            name="customer_name"
-            placeholder="Masukkan nama pelanggan"
-            required
-          />
-        </div>
+          <div class="form-group">
+              <label for="customer-name">Nama Pelanggan</label>
+              <select id="customer-name" name="customer_name" required>
+                  <option value="" disabled selected>Pilih Nama Pelanggan</option>
+              </select>
+          </div>
+
         <div class="form-group">
           <label for="customer-phone">Nomor Telepon</label>
           <input
