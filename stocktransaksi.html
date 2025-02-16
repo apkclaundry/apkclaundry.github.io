@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Transaction</title>
+    <link rel="stylesheet" href="src/css/stocktransaksi.css"> <!-- Referensi file CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+
+<body>
+    <a href="stock.html" class="back-button">
+        <i class="fa-solid fa-circle-left" style="color: #2196f3;"></i>
+    </a>
+    <h1>Transaksi Stok</h1>
+    <div class="container">
+        <form id="stockTransactionForm">
+            <label for="itemID">Pilih Barang:</label>
+            <select id="itemID" name="id_barang">
+                <!-- Option items will be populated dynamically from the database -->
+            </select>
+            <br>
+
+            <label for="transactionType">Tipe Transaksi:</label>
+            <select id="transactionType" name="jenis_transaksi">
+                <option value="Pembelian">Pembelian</option>
+                <option value="Pemakaian">Pemakaian</option>
+            </select>
+            <br>
+
+            <label for="quantity">Kuantitas:</label>
+            <input type="number" id="quantity" name="jumlah" min="1" required>
+            <br>
+
+            <button type="submit">Simpan Transaksi</button>
+        </form>
+
+        <section>
+            <h2>Data Transaksi Stok</h2>
+            <table id="stocktransaction-table">
+                <thead>
+                    <tr>
+                        <th>ID Transaksi</th>
+                        <th>ID Barang</th>
+                        <th>Tanggal</th>
+                        <th>Tipe Transaksi</th>
+                        <th>Qty</th>
+                        <th>Jumlah Stok Setelahnya</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Transactions will be displayed here -->
+                </tbody>
+            </table>
+            <div class="stocktransaction-list"></div>
+        </section>
+        <div class="stocktransaction-list"></div>
+
+    </div>
+
+    <script src="src/js/stocktransaksi.js"></script> <!-- Referensi file JS -->
+</body>
+
+</html>

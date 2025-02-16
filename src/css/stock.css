@@ -6,7 +6,7 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
+    
   html, body {
     margin: 0;
     padding: 0;
@@ -93,6 +93,20 @@
   
   .btn-save:hover {
     background-color: #27ae60;
+  }
+
+  .btn-add {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
   }
   
   /* Table Styling */

@@ -1,261 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laundry POS - Manajemen Stok</title>
-    <link rel="stylesheet" href="src/css/stock.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-    <script type="module">
-      import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
-      import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
-    
-      addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
-    
-      // Fungsi untuk menyimpan token dari URL ke localStorage
-      function saveTokenFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("authToken");
-        if (token) {
-          localStorage.setItem("authToken", token);
-          console.log("Token berhasil disimpan ke localStorage:", token);
-        } 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laundry POS - Manajemen Stok</title>
+  <link rel="stylesheet" href="src/css/stock.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+  <script type="module">
+    import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
+    import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
+
+    addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
+
+    // Fungsi untuk menyimpan token dari URL ke localStorage
+    function saveTokenFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("authToken");
+      if (token) {
+        localStorage.setItem("authToken", token);
+        console.log("Token berhasil disimpan ke localStorage:", token);
       }
-  
-      // Fungsi untuk melakukan validasi localStorage
-      function validateLogin() {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          Swal.fire({
-            title: "Akses Ditolak",
-            text: "Silahkan login terlebih dahulu",
-            icon: "warning",
-            confirmButtonText: "Login",
-          }).then(() => {
-            // Redirect ke halaman login jika diperlukan
-            window.location.href = "https://apkclaundry.github.io/";
-          });
-        }
+    }
+
+    // Fungsi untuk melakukan validasi localStorage
+    function validateLogin() {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        Swal.fire({
+          title: "Akses Ditolak",
+          text: "Silahkan login terlebih dahulu",
+          icon: "warning",
+          confirmButtonText: "Login",
+        }).then(() => {
+          // Redirect ke halaman login jika diperlukan
+          window.location.href = "https://apkclaundry.github.io/";
+        });
       }
-  
-      // Panggil fungsi untuk menyimpan token dan validasi saat halaman dimuat
-      document.addEventListener("DOMContentLoaded", () => {
-        saveTokenFromURL();
-        validateLogin();
-      });
-    </script>
-    <style>
-      /* Container utama */
-.stock-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
+    }
 
-/* Tabel stok barang untuk desktop */
-#stock-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
+    // Panggil fungsi untuk menyimpan token dan validasi saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+      saveTokenFromURL();
+      validateLogin();
+    });
+  </script>
+  <style>
+    /* Container utama */
+    .stock-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
 
-#stock-table th, #stock-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
+    /* Tabel stok barang untuk desktop */
+    #stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
 
-#stock-table th {
-  background-color: #007bff;
-  color: white;
-}
+    #stock-table th,
+    #stock-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
 
-/* Sembunyikan tabel di mode mobile */
-@media (max-width: 768px) {
-  #stock-table {
+    #stock-table th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    /* Sembunyikan tabel di mode mobile */
+    @media (max-width: 768px) {
+      #stock-table {
+        display: none;
+      }
+    }
+
+    /* Versi Mobile (Card Style) */
+    .stock-list {
       display: none;
-  }
-}
+      /* Default: tidak ditampilkan di desktop */
+      margin-top: 20px;
+    }
 
-/* Versi Mobile (Card Style) */
-.stock-list {
-  display: none; /* Default: tidak ditampilkan di desktop */
-  margin-top: 20px;
-}
+    .stock-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-.stock-item {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
+    .stock-item p {
+      margin: 5px 0;
+    }
 
-.stock-item p {
-  margin: 5px 0;
-}
+    .stock-item .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
 
-.stock-item .actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
+    .stock-item .actions button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-.stock-item .actions button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
+    .stock-item .actions .edit {
+      background-color: #ffc107;
+      color: #fff;
+    }
 
-.stock-item .actions .edit {
-  background-color: #ffc107;
-  color: #fff;
-}
+    .stock-item .actions .delete {
+      background-color: #dc3545;
+      color: #fff;
+    }
 
-.stock-item .actions .delete {
-  background-color: #dc3545;
-  color: #fff;
-}
+    /* Tampilkan daftar stok hanya di mode mobile */
+    @media (max-width: 768px) {
+      .stock-list {
+        display: block;
+      }
+    }
+  </style>
+</head>
 
-/* Tampilkan daftar stok hanya di mode mobile */
-@media (max-width: 768px) {
-  .stock-list {
-      display: block;
-  }
-}
-
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="header-container">
-        <div class="logo">
-          <img src="src/img/logo.png" alt="Logo Laundry POS" />
-          <h1>Laundry POS</h1>
-        </div>
-        <ul class="nav-links">
-          <li><a href="dashboard.html">Dashboard</a></li>
-          <li><a href="datapelanggan.html">Data Pelanggan</a></li>
-          <li><a href="karyawan.html">Karyawan</a></li>
-          <li><a href="supplier.html">Supplier</a></li>
-          <li><a href="stock.html" style="background-color: rgb(70, 70, 70); padding: 5px 10px; border-radius: 5px;">Stock</a></li>
-          <li><a href="laporan.html">Laporan</a></li>
-          <li><button id="logoutBtn" class="btn btn-danger">Logout</button></li>
-        </ul>
-          <button class="burger" aria-label="Toggle menu">
-            <i class="fas fa-bars"></i>
-          </button>
-        </nav>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <img src="src/img/logo.png" alt="Logo Laundry POS" />
+        <h1>Laundry POS</h1>
       </div>
-    </header>
-    <div class="container">
-      <form id="stock-form">
-        <div class="form-group">
-          <label for="item-name">Nama Barang</label>
-          <input
-            type="text"
-            id="item-name"
-            placeholder="Masukkan nama barang"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="item-stock">Stok</label>
-          <input
-            type="number"
-            id="item-stock"
-            placeholder="Masukkan jumlah stok"
-            min="0"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="item-price">Harga per Unit</label>
-          <input
-            type="number"
-            id="item-price"
-            placeholder="Masukkan harga per unit"
-            min="0"
-            required
-          />
-        </div>
-        <button type="submit" class="btn-save">Simpan</button>
-      </form>
-      
-      <section>
+      <ul class="nav-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+        <li><a href="karyawan.html">Karyawan</a></li>
+        <li><a href="supplier.html">Supplier</a></li>
+        <li><a href="stock.html"
+            style="background-color: rgb(70, 70, 70); padding: 5px 10px; border-radius: 5px;">Stock</a></li>
+        <li><a href="laporan.html">Laporan</a></li>
+        <li><button id="logoutBtn" class="btn btn-danger">Logout</button></li>
+      </ul>
+      <button class="burger" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      </nav>
+    </div>
+  </header>
+  <div class="container">
+    <form id="stock-form">
+      <div class="form-group">
+        <label for="item-name">Nama Barang</label>
+        <input type="text" id="item-name" placeholder="Masukkan nama barang" required />
+      </div>
+      <div class="form-group">
+        <label for="item-stock">Stok</label>
+        <input type="number" id="item-stock" placeholder="Masukkan jumlah stok" min="0" required />
+      </div>
+      <div class="form-group">
+        <label for="item-price">Harga per Unit</label>
+        <input type="number" id="item-price" placeholder="Masukkan harga per unit" min="0" required />
+      </div>
+      <button type="submit" class="btn-save">Simpan</button>
+      <button class="btn-add" onclick="window.location.href='stocktransaksi.html'">Tambah Transaksi</button>
+    </form>
+
+    <section>
       <div class="container">
         <h2>Data Stok</h2>
         <div class="table-responsive">
-        <!-- Tabel untuk tampilan desktop -->
-        <table id="stock-table">
-          <thead>
-            <tr>
-              <th>ID Barang</th>
-              <th>Nama Barang</th>
-              <th>Stok</th>
-              <th>Harga per Unit</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div class="stock-list"></div>
-      </div>
-      </section>
-        <!-- List untuk tampilan mobile -->
-        <div class="stock-list"></div>
-      </div>
-      
+          <!-- Tabel untuk tampilan desktop -->
+          <table id="stock-table">
+            <thead>
+              <tr>
+                <th>ID Barang</th>
+                <th>Nama Barang</th>
+                <th>Stok</th>
+                <th>Harga per Unit</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="stock-list"></div>
+        </div>
+    </section>
+    <!-- List untuk tampilan mobile -->
+    <div class="stock-list"></div>
+  </div>
 
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.js"></script>
-    <script src="src/js/stock.js" type="module"></script>
-    <script>
-      // Toggle menu visibility
-      document.querySelector(".burger").addEventListener("click", () => {
-        const navLinks = document.querySelector(".nav-links");
-        navLinks.classList.toggle("active");
+
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.js"></script>
+  <script src="src/js/stock.js" type="module"></script>
+  <script>
+    // Toggle menu visibility
+    document.querySelector(".burger").addEventListener("click", () => {
+      const navLinks = document.querySelector(".nav-links");
+      navLinks.classList.toggle("active");
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", function (event) {
+      event.preventDefault(); // Mencegah link untuk melakukan redirect langsung
+
+      // Menampilkan notifikasi konfirmasi logout
+      Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Anda akan keluar dari akun ini.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Logout',
+        cancelButtonText: 'Batal',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Menghapus item dari localStorage
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userName");
+          localStorage.removeItem("userPhoneNumber");
+
+          // Redirect ke halaman login setelah logout
+          window.location.href = "https://apkclaundry.github.io/";
+        }
       });
+    });
+  </script>
+</body>
 
-      document.getElementById("logoutBtn").addEventListener("click", function (event) {
-        event.preventDefault(); // Mencegah link untuk melakukan redirect langsung
-        
-        // Menampilkan notifikasi konfirmasi logout
-        Swal.fire({
-          title: 'Apakah Anda yakin?',
-          text: "Anda akan keluar dari akun ini.",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Ya, Logout',
-          cancelButtonText: 'Batal',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Menghapus item dari localStorage
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("userEmail");
-            localStorage.removeItem("userName");
-            localStorage.removeItem("userPhoneNumber");
-
-            // Redirect ke halaman login setelah logout
-            window.location.href = "https://apkclaundry.github.io/";
-          }
-        });
-      });
-    </script>
-  </body>
 </html>
