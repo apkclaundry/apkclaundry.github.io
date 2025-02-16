@@ -4,13 +4,13 @@ async function fetchItems() {
         const response = await fetch("https://apkclaundry.vercel.app/stock", {
             method: "GET",
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${getAuthToken()}`,
                 "Content-Type": "application/json",
             },
         });
 
         const data = await response.json();
-        console.log("Items fetched:", data); // Debugging
+        console.log("Items fetched:", data); // Debugging response
 
         if (!data.items || !Array.isArray(data.items)) {
             console.error("Data items tidak valid atau bukan array.");
@@ -37,9 +37,22 @@ async function fetchItems() {
     }
 }
 
-// Fungsi untuk mendapatkan token autentikasi
+
 function getAuthToken() {
-    return localStorage.getItem("authToken") || "";
+  const token = localStorage.getItem("authToken");
+  console.log("Token retrieved from localStorage:", token); // Debug log
+  if (!token) {
+    Swal.fire({
+      title: "Error!",
+      text: "Token tidak ditemukan, silakan login kembali.",
+      icon: "error",
+      confirmButtonText: "Login",
+    }).then(() => {
+      window.location.href = "/login.html"; // Ganti dengan halaman login Anda
+    });
+    throw new Error("Token tidak ditemukan di localStorage.");
+  }
+  return token;
 }
 
 // Fungsi untuk menampilkan data stok
