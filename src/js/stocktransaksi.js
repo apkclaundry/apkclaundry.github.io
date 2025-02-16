@@ -1,17 +1,30 @@
 // Fetch available items from the backend and populate the select dropdown
 async function fetchItems() {
     try {
-        const response = await fetch('/api/items');
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const response = await fetch("https://apkclaundry.vercel.app/stock", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
 
         const data = await response.json();
         console.log("Items fetched:", data); // Debugging
+
+        if (!data.items || !Array.isArray(data.items)) {
+            console.error("Data items tidak valid atau bukan array.");
+            return;
+        }
 
         const itemSelect = document.getElementById('itemID');
         if (!itemSelect) {
             console.error("Elemen #itemID tidak ditemukan di DOM.");
             return;
         }
+
+        // Kosongkan dropdown sebelum menambahkan opsi baru
+        itemSelect.innerHTML = `<option value="" disabled selected>Pilih barang...</option>`;
 
         data.items.forEach(item => {
             const option = document.createElement('option');
@@ -24,14 +37,30 @@ async function fetchItems() {
     }
 }
 
+// Fungsi untuk mendapatkan token autentikasi
+function getAuthToken() {
+    return localStorage.getItem("authToken") || "";
+}
+
 // Fungsi untuk menampilkan data stok
 async function fetchStocksTransactions() {
-    const token = getAuthToken(); // Pastikan fungsi ini ada
+    const token = getAuthToken();
+
+    if (!token) {
+        console.error("Token autentikasi tidak ditemukan.");
+        Swal.fire({
+            title: "Error!",
+            text: "Anda harus login untuk melihat transaksi stok.",
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
 
     try {
         console.log("Fetching stocks transactions with token:", token);
 
-        const response = await fetch("https://apkclaundry.vercel.app/transaction-stok", {
+        const response = await fetch("https://apkclaundry.vercel.app/transaksi-stok", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -75,13 +104,19 @@ function displayStocksTransactions(stockstransactions) {
     stocktransactionTableBody.innerHTML = "";
     stocktransactionList.innerHTML = "";
 
+    if (stockstransactions.length === 0) {
+        stocktransactionTableBody.innerHTML = "<tr><td colspan='7' style='text-align: center;'>Belum ada transaksi stok</td></tr>";
+        stocktransactionList.innerHTML = "<p style='text-align: center;'>Belum ada transaksi stok</p>";
+        return;
+    }
+
     stockstransactions.forEach((stocktransaction) => {
         // **Tampilan Tabel (Desktop)**
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${stocktransaction.id_transaksi}</td>
             <td>${stocktransaction.id_barang}</td>
-            <td>${new Date(stocktransaction.tanggal).toLocaleString()}</td>
+            <td>${new Date(stocktransaction.tanggal).toLocaleDateString()}</td>
             <td>${stocktransaction.jenis_transaksi}</td>
             <td>${stocktransaction.jumlah}</td>
             <td>${stocktransaction.stok_setelah}</td>
@@ -99,7 +134,7 @@ function displayStocksTransactions(stockstransactions) {
         listItem.innerHTML = `
             <p><strong>ID Transaksi:</strong> ${stocktransaction.id_transaksi}</p>
             <p><strong>ID Barang:</strong> ${stocktransaction.id_barang}</p>
-            <p><strong>Tanggal:</strong> ${new Date(stocktransaction.tanggal).toLocaleString()}</p>
+            <p><strong>Tanggal:</strong> ${new Date(stocktransaction.tanggal).toLocaleDateString()}</p>
             <p><strong>Jenis Transaksi:</strong> ${stocktransaction.jenis_transaksi}</p>
             <p><strong>Jumlah:</strong> ${stocktransaction.jumlah}</p>
             <p><strong>Stok Setelah:</strong> ${stocktransaction.stok_setelah}</p>
@@ -115,4 +150,82 @@ function displayStocksTransactions(stockstransactions) {
 // Panggil fungsi saat halaman dimuat
 fetchItems();
 fetchStocksTransactions();
-// Panggil fungsi saat halaman dimuat
+
+document.getElementById('stockTransactionForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const itemId = document.getElementById('itemID').value;  // Perbaiki ID sesuai
+    const quantity = document.getElementById('quantity').value;
+    const type = document.getElementById('transactionType').value;
+
+    fetch('https://apkclaundry.vercel.app/transaksi-stok', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id_barang: itemId,
+            jumlah: parseInt(quantity),
+            jenis_transaksi: type  // Sesuaikan field nama
+        })
+    })
+    .then(response => response.json())
+    .then(_data => {
+        alert('Transaksi berhasil disimpan');
+        updateStockTransactionTable(); // Perbarui tabel stok
+        updateStockTransactionCards(); // Perbarui kartu transaksi stok
+    })
+    .catch(error => console.error('Error saving stock transaction:', error));
+});
+
+
+
+  // Perbarui fungsi update stok transaksi
+function updateStockTransactionTable() {
+    fetch('https://apkclaundry.vercel.app/transaksi-stok')
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.getElementById('stocktransaction-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+  
+        data.forEach(stocktransaction => {
+          const row = tableBody.insertRow();
+          row.innerHTML = `
+            <td>${stocktransaction.id_transaksi}</td>
+            <td>${stocktransaction.id_barang}</td>
+            <td>${new Date(stocktransaction.tanggal).toLocaleDateString()}</td>
+            <td>${stocktransaction.jenis_transaksi}</td>
+            <td>${stocktransaction.jumlah}</td>
+            <td>${stocktransaction.stok_setelah}</td>
+            <td class="actions">
+                <button class="edit" onclick="editStock('${stocktransaction.id_transaksi}')">&#9998;</button>
+                <button class="delete" onclick="deleteStock('${stocktransaction.id_transaksi}')">&#128465;</button>
+            </td>
+          `;
+        });
+      })
+      .catch(error => console.error('Error fetching transactions:', error));
+}
+  
+// Update Kartu Transaksi
+function updateStockTransactionCards() {
+    fetch('https://apkclaundry.vercel.app/transaksi-stok')
+      .then(response => response.json())
+      .then(data => {
+        const transactionCards = document.getElementById('stocktransaction-cards');
+        transactionCards.innerHTML = ''; // Kosongkan card sebelumnya
+  
+        data.forEach(stocktransaction => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <h4>${stocktransaction.id_barang}</h4>
+            <p>Jumlah: ${stocktransaction.jumlah}</p>
+            <p>Jenis: ${stocktransaction.jenis_transaksi}</p>
+            <p>Tanggal: ${new Date(stocktransaction.tanggal).toLocaleDateString()}</p>
+          `;
+          transactionCards.appendChild(card);
+        });
+      })
+      .catch(error => console.error('Error fetching transactions:', error));
+}
