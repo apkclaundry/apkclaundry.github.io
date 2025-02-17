@@ -49,110 +49,93 @@
     </script>
     </head>
     <body>
-    <header>
-        <div class="header-container">
-        <div class="logo">    
-            <img src="src/img/logo.png" alt="Logo Laundry POS" />
-            <h1>Laundry POS</h1>
-        </div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="datapelanggan.html">Data Pelanggan</a></li>
-                <li><a href="karyawan.html">Karyawan</a></li>
-                <li><a href="supplier.html" style="background-color: rgb(70, 70, 70); padding: 5px 10px; border-radius: 5px;">Supplier</a></li>
-                <li><a href="stock.html">Stock</a></li>
-                <li><a href="laporan.html">Laporan</a></li>
-                <li><button id="logoutBtn" class="btn btn-danger">Logout</button></li>
-              </ul>
-            <button class="burger" aria-label="Toggle menu">
-            <i class="fas fa-bars"></i>
-            </button>
-        </nav>
-        </div>
-    </header>
-    <main>
-        <!-- Formulir Data Supplier -->
-        <form id="supplier-form">
-        <div class="form-group">
-            <label for="supplier-name">Nama Supplier</label>
-            <input
-            type="text"
-            id="supplier-name"
-            name="supplier_name"
-            placeholder="Masukkan nama supplier"
-            required
-            />
-        </div>
-        <div class="form-group">
-            <label for="supplier-phone">Nomor Telepon</label>
-            <input
-            type="tel"
-            id="supplier-phone"
-            name="supplier_phone"
-            placeholder="08xxxxxxxxxx"
-            pattern="[0-9]{10,13}"
-            title="Masukkan nomor telepon yang valid (10-13 digit angka)"
-            required
-            />
-        </div>
-        <div class="form-group">
-            <label for="supplier-address">Alamat</label>
-            <input
-            type="text"
-            id="supplier-address"
-            name="supplier_address"
-            placeholder="Masukkan alamat supplier"
-            required
-            />
-        </div>
-        <div class="form-group">
-            <label for="supplier-email">Email</label>
-            <input
-            type="email"
-            id="supplier-email"
-            name="supplier_email"
-            placeholder="Masukkan email supplier"
-            required
-            />
-        </div>
-        <div class="form-group">
-            <label for="supplier-products">Produk yang Disuplai</label>
-            <textarea
-            id="supplier-products"
-            name="supplier_products"
-            placeholder="Masukkan produk yang disuplai (pisahkan dengan koma)"
-            required
-            ></textarea>
-        </div>
-        <div class="form-group buttons">
-            <button type="reset" class="btn-reset">Reset</button>
-            <button type="button" id="save-btn" class="btn-submit">Simpan</button>
-        </div>
-        </form>
-        <section>
-            <h2>Data Supplier</h2>
-            <div class="supplier-list"></div>
-          
-            <div class="table-responsive">
-              <table id="supplier-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Nomor Telepon</th>
-                    <th>Alamat</th>
-                    <th>Email</th>
-                    <th>Produk yang Disuplai</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
+      <header>
+          <div class="header-container">
+              <div class="logo">    
+                  <img src="src/img/logo.png" alt="Logo Laundry POS" />
+                  <h1>Laundry POS</h1>
+              </div>
+              <nav>
+                  <ul class="nav-links">
+                      <li><a href="dashboard.html">Dashboard</a></li>
+                      <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+                      <li><a href="karyawan.html">Karyawan</a></li>
+                      <li><a href="supplier.html" class="active">Supplier</a></li>
+                      <li><a href="stock.html">Stock</a></li>
+                      <li><a href="laporan.html">Laporan</a></li>
+                      <li><button id="logoutBtn" class="btn btn-danger">Logout</button></li>
+                  </ul>
+                  <button class="burger" aria-label="Toggle menu">
+                      <i class="fas fa-bars"></i>
+                  </button>
+              </nav>
+          </div>
+      </header>
+      <main>
+          <form id="supplier-form">
+              <div class="form-group">
+                  <label for="supplier-name">Nama Supplier</label>
+                  <input type="text" id="supplier-name" required />
+              </div>
+              <div class="form-group">
+                  <label for="supplier-phone">Nomor Telepon</label>
+                  <input type="tel" id="supplier-phone" pattern="[0-9]{10,13}" required />
+              </div>
+              <div class="form-group">
+                  <label for="supplier-address">Alamat</label>
+                  <input type="text" id="supplier-address" required />
+              </div>
+              <div class="form-group">
+                  <label for="supplier-email">Email</label>
+                  <input type="email" id="supplier-email" required />
+              </div>
+              <div class="form-group">
+                  <label for="supplier-products">Produk yang Disuplai</label>
+                  <textarea id="supplier-products" required></textarea>
+              </div>
+              <div class="form-group buttons">
+                  <button type="reset" class="btn-reset">Reset</button>
+                  <button type="button" id="save-btn" class="btn-submit">Simpan</button>
+              </div>
+          </form>
+          <section>
+              <h2>Data Supplier</h2>
+              <div class="supplier-list"></div>
+              <div class="table-responsive">
+                  <table id="supplier-table">
+                      <thead>
+                          <tr>
+                              <th>ID</th>
+                              <th>Nama</th>
+                              <th>Nomor Telepon</th>
+                              <th>Alamat</th>
+                              <th>Email</th>
+                              <th>Produk yang Disuplai</th>
+                              <th>Aksi</th>
+                          </tr>
+                      </thead>
+                      <tbody id="orderTableBody"></tbody>
+                  </table>
+              </div>
           </section>
-          
-    </main>
+          <section>
+              <h2>Transaksi Supplier</h2>
+              <div class="table-responsive">
+                  <table id="supplier-transaction-table">
+                      <thead>
+                          <tr>
+                              <th>ID Transaksi</th>
+                              <th>Nama Supplier</th>
+                              <th>Tanggal</th>
+                              <th>Jumlah</th>
+                              <th>Metode Pembayaran</th>
+                          </tr>
+                      </thead>
+                      <tbody id="transactionTableBody"></tbody>
+                  </table>
+              </div>
+          </section>
+      </main>
     <script src="src/js/supplier.js" type="module"></script>
     <script>
       // Toggle menu visibility

@@ -1,0 +1,109 @@
+/* Basic styling */
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+}
+
+/* Styling for the back button */
+.back-button {
+    font-size: 40px;
+    text-decoration: none;
+    color: #2196f3;
+    margin: 10px 0;
+    display: inline-block;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Form and other styles */
+
+
+label {
+    display: block;
+    margin: 8px 0 4px;
+}
+
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2196f3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f8f8;
+}
+
+.stocktransaction-list {
+    display: none;
+    /* Default: tidak ditampilkan di desktop */
+    margin-top: 20px;
+}
+
+.stocktransaction-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stocktransaction-item p {
+    margin: 5px 0;
+}
+
+/* Media query untuk tampilan mobile */
+@media (max-width: 768px) {
+    #stocktransaction-table {
+        display: none;
+    }
+
+
+
+}

@@ -468,3 +468,36 @@ body {
     display: block;
   }
 }
+
+#supplier-transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#supplier-transaction-table th, #supplier-transaction-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#supplier-transaction-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+#supplier-transaction-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#supplier-transaction-table tr:hover {
+  background-color: #ddd;
+}
+
+#supplier-transaction-table th, #supplier-transaction-table td {
+  padding: 12px 15px;
+}
+
+#supplier-transaction-table th {
+  background-color: #4CAF50;
+  color: white;
+}
