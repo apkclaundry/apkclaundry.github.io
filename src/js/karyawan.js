@@ -105,7 +105,7 @@ function displayEmployees(employees) {
       <p><strong>ID Karyawan:</strong> ${employee.id}</p>
       <p><strong>Nama Karyawan:</strong> ${employee.username}</p>
       <p><strong>Role:</strong> ${employee.role}</p>
-      <p><strong>Tanggal Rekrutment :</strong> ${new Date(employee.hired_date).toLocaleDateString()}</p>     
+
       <p><strong>Gaji bulan ini:</strong> ${formattedSalary}</p>
       <div class="actions">
         <button class="salary" onclick="addSalary('${employee.id}')">💰</button>
@@ -116,7 +116,7 @@ function displayEmployees(employees) {
     employeeList.appendChild(listItem);
   });
 }
-
+//      <p><strong>Tanggal Rekrutment :</strong> ${new Date(employee.hired_date).toLocaleDateString()}</p>     
 // Fungsi untuk menambahkan atau mengupdate salary karyawan
 async function addSalary(id) {
   const token = getAuthToken();
