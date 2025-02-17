@@ -72,14 +72,14 @@ function displayEmployees(employees) {
   employeeList.innerHTML = ""; // Reset list
 
   employees.forEach((employee) => {
-    // Format salary ke format Rupiah
+    console.log('Hired Date:', employee.hired_date);  // Tambahkan log ini
+
     const formattedSalary = new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0
     }).format(employee.salary);
 
-    // Menambahkan data ke tabel
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${employee.id}</td>
@@ -87,7 +87,7 @@ function displayEmployees(employees) {
       <td>${employee.role}</td>
       <td>${employee.phone}</td>
       <td>${employee.address}</td>
-      <td>${new Date(employee.hired_date).toLocaleDateString()}</td>
+
       <td>${formattedSalary}</td>
       <td>${employee.salary_date}</td>
       <td class="actions">
@@ -97,7 +97,7 @@ function displayEmployees(employees) {
       </td>
     `;
     employeeTableBody.appendChild(row);
-
+//      <td>${employee.hired_date ? new Date(employee.hired_date.trim()).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</td>
     // Menambahkan data ke dalam list untuk tampilan mobile
     const listItem = document.createElement("div");
     listItem.classList.add("employee-item");
