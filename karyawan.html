@@ -13,11 +13,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
   <script type="module">
-    import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/src/sweetalert2.js";
     import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js";
-
     addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
-
+  
     // Fungsi untuk menyimpan token dari URL ke localStorage
     function saveTokenFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -25,7 +23,7 @@
       if (token) {
         localStorage.setItem("authToken", token);
         console.log("Token berhasil disimpan ke localStorage:", token);
-      }
+      } 
     }
 
     // Fungsi untuk melakukan validasi localStorage
@@ -114,7 +112,7 @@
           <th>Role</th>
           <th>No Telp</th>
           <th>Alamat</th>
-          <th>Tanggal Rekrutmen</th>
+          <!-- <th>Tanggal Rekrutmen</th> -->
           <th>Gaji Bulan ini</th>
           <th>Tanggal Gajian</th>
           <th>Actions</th>
