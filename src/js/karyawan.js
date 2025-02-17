@@ -326,7 +326,6 @@ async function deleteEmployee(id) {
 // Event listener untuk memuat data
 document.addEventListener("DOMContentLoaded", () => {
   const employeeForm = document.getElementById("employee-form");
-  const searchInput = document.getElementById("search-input");
 
   if (!employeeForm) {
     console.error("Form karyawan tidak ditemukan.");
@@ -340,8 +339,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const phone = document.getElementById("employee-phone").value.trim();
     const address = document.getElementById("employee-address").value.trim();
     const role = document.getElementById("employee-role").value;
+    const password = document.getElementById("employee-password").value.trim();
 
-    if (!name || !phone || !address || !role) {
+    if (!name || !phone || !address || !role || !password) {
       Swal.fire({
         title: "Peringatan!",
         text: "Mohon lengkapi semua data!",
@@ -358,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: name, phone, address, role }),
+        body: JSON.stringify({ username: name, phone, address, role, password }),
       });
 
       if (!response.ok) {
