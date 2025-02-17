@@ -1,58 +1,43 @@
 // Fetch available items from the backend and populate the select dropdown
+// Fungsi untuk mengambil daftar pelanggan dari API dan mengisi dropdown
 async function fetchItems() {
     try {
-        const response = await fetch("https://apkclaundry.vercel.app/stock", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${getAuthToken()}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        const data = await response.json();
-        console.log("Items fetched:", data); // Debugging response
-
-        if (!data.items || !Array.isArray(data.items)) {
-            console.error("Data items tidak valid atau bukan array.");
-            return;
-        }
-
-        const itemSelect = document.getElementById('itemID');
-        if (!itemSelect) {
-            console.error("Elemen #itemID tidak ditemukan di DOM.");
-            return;
-        }
-
-        // Kosongkan dropdown sebelum menambahkan opsi baru
-        itemSelect.innerHTML = `<option value="" disabled selected>Pilih barang...</option>`;
-
-        data.items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = item.item_name;
+        const response = await fetch("https://apkclaundry.vercel.app/item-name");
+        if (!response.ok) throw new Error("Gagal mengambil data item.");
+  
+        const items = await response.json();
+        const itemSelect = document.getElementById("item-name");
+  
+        // Reset dropdown
+        itemSelect.innerHTML = `<option value="" disabled selected>Pilih Nama barang</option>`;
+  
+        items.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.name;
+            option.textContent = item.name;
             itemSelect.appendChild(option);
         });
     } catch (error) {
         console.error("Error fetching items:", error);
     }
-}
+  }
 
 
 function getAuthToken() {
-  const token = localStorage.getItem("authToken");
-  console.log("Token retrieved from localStorage:", token); // Debug log
-  if (!token) {
-    Swal.fire({
-      title: "Error!",
-      text: "Token tidak ditemukan, silakan login kembali.",
-      icon: "error",
-      confirmButtonText: "Login",
-    }).then(() => {
-      window.location.href = "/login.html"; // Ganti dengan halaman login Anda
-    });
-    throw new Error("Token tidak ditemukan di localStorage.");
-  }
-  return token;
+    const token = localStorage.getItem("authToken");
+    console.log("Token retrieved from localStorage:", token); // Debug log
+    if (!token) {
+        Swal.fire({
+            title: "Error!",
+            text: "Token tidak ditemukan, silakan login kembali.",
+            icon: "error",
+            confirmButtonText: "Login",
+        }).then(() => {
+            window.location.href = "/login.html"; // Ganti dengan halaman login Anda
+        });
+        throw new Error("Token tidak ditemukan di localStorage.");
+    }
+    return token;
 }
 
 // Fungsi untuk menampilkan data stok
@@ -129,13 +114,14 @@ function displayStocksTransactions(stockstransactions) {
         row.innerHTML = `
             <td>${stocktransaction.id_transaksi}</td>
             <td>${stocktransaction.id_barang}</td>
+            <td>${stocktransaction.item_name}</td>
             <td>${new Date(stocktransaction.tanggal).toLocaleDateString()}</td>
             <td>${stocktransaction.jenis_transaksi}</td>
             <td>${stocktransaction.jumlah}</td>
             <td>${stocktransaction.stok_setelah}</td>
             <td class="actions">
-                <button class="edit" onclick="editStock('${stocktransaction.id_transaksi}')">&#9998;</button>
-                <button class="delete" onclick="deleteStock('${stocktransaction.id_transaksi}')">&#128465;</button>
+                <button class="edit" onclick="editStock('${stocktransaction.id}')">&#9998;</button>
+                <button class="delete" onclick="deleteStock('${stocktransaction.id}')">&#128465;</button>
             </td>
         `;
         stocktransactionTableBody.appendChild(row);
@@ -143,17 +129,17 @@ function displayStocksTransactions(stockstransactions) {
         // **Tampilan Card (Mobile)**
         const listItem = document.createElement("div");
         listItem.classList.add("stocktransaction-item");
-        listItem.dataset.id = stocktransaction.id_transaksi;
+        listItem.dataset.id = stocktransaction.id;
         listItem.innerHTML = `
-            <p><strong>ID Transaksi:</strong> ${stocktransaction.id_transaksi}</p>
+            <p><strong>ID Transaksi:</strong> ${stocktransaction.id}</p>
             <p><strong>ID Barang:</strong> ${stocktransaction.id_barang}</p>
             <p><strong>Tanggal:</strong> ${new Date(stocktransaction.tanggal).toLocaleDateString()}</p>
             <p><strong>Jenis Transaksi:</strong> ${stocktransaction.jenis_transaksi}</p>
             <p><strong>Jumlah:</strong> ${stocktransaction.jumlah}</p>
             <p><strong>Stok Setelah:</strong> ${stocktransaction.stok_setelah}</p>
             <div class="actions">
-                <button class="edit" onclick="editStock('${stocktransaction.id_transaksi}')">Edit</button>
-                <button class="delete" onclick="deleteStock('${stocktransaction.id_transaksi}')">Hapus</button>
+                <button class="edit" onclick="editStock('${stocktransaction.id}')">Edit</button>
+                <button class="delete" onclick="deleteStock('${stocktransaction.id}')">Hapus</button>
             </div>
         `;
         stocktransactionList.appendChild(listItem);
@@ -161,8 +147,14 @@ function displayStocksTransactions(stockstransactions) {
 }
 
 // Panggil fungsi saat halaman dimuat
-fetchItems();
-fetchStocksTransactions();
+
+// Jalankan saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    loadCustomerData();
+    populateCustomerDropdown();
+    fetchItems();
+    fetchStocksTransactions();
+});
 
 document.getElementById('save-btn').addEventListener('click', function (event) {
     event.preventDefault();
@@ -182,63 +174,94 @@ document.getElementById('save-btn').addEventListener('click', function (event) {
             jenis_transaksi: type  // Sesuaikan field nama
         })
     })
-    .then(response => response.json())
-    .then(_data => {
-        alert('Transaksi berhasil disimpan');
-        updateStockTransactionTable(); // Perbarui tabel stok
-        updateStockTransactionCards(); // Perbarui kartu transaksi stok
-    })
-    .catch(error => console.error('Error saving stock transaction:', error));
+        .then(response => response.json())
+        .then(_data => {
+            alert('Transaksi berhasil disimpan');
+            updateStockTransactionTable(); // Perbarui tabel stok
+            updateStockTransactionCards(); // Perbarui kartu transaksi stok
+        })
+        .catch(error => console.error('Error saving stock transaction:', error));
 });
 
 
 
-  // Perbarui fungsi update stok transaksi
+// Perbarui fungsi update stok transaksi
 function updateStockTransactionTable() {
     fetch('https://apkclaundry.vercel.app/item-transaction')
-      .then(response => response.json())
-      .then(data => {
-        const tableBody = document.getElementById('stocktransaction-table').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
-  
-        data.forEach(stocktransaction => {
-          const row = tableBody.insertRow();
-          row.innerHTML = `
-            <td>${stocktransaction.id_transaksi}</td>
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('stocktransaction-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+
+            data.forEach(stocktransaction => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+            <td>${stocktransaction.id}</td>
             <td>${stocktransaction.id_barang}</td>
             <td>${new Date(stocktransaction.tanggal).toLocaleDateString()}</td>
             <td>${stocktransaction.jenis_transaksi}</td>
             <td>${stocktransaction.jumlah}</td>
             <td>${stocktransaction.stok_setelah}</td>
             <td class="actions">
-                <button class="edit" onclick="editStock('${stocktransaction.id_transaksi}')">&#9998;</button>
-                <button class="delete" onclick="deleteStock('${stocktransaction.id_transaksi}')">&#128465;</button>
+                <button class="edit" onclick="editStock('${stocktransaction.id}')">&#9998;</button>
+                <button class="delete" onclick="deleteStock('${stocktransaction.id}')">&#128465;</button>
             </td>
           `;
-        });
-      })
-      .catch(error => console.error('Error fetching transactions:', error));
+            });
+        })
+        .catch(error => console.error('Error fetching transactions:', error));
 }
-  
+
 // Update Kartu Transaksi
 function updateStockTransactionCards() {
     fetch('https://apkclaundry.vercel.app/item-transaction')
-      .then(response => response.json())
-      .then(data => {
-        const transactionCards = document.getElementById('stocktransaction-cards');
-        transactionCards.innerHTML = ''; // Kosongkan card sebelumnya
-  
-        data.forEach(stocktransaction => {
-          const card = document.createElement('div');
-          card.classList.add('card');
-          card.innerHTML = `
+        .then(response => response.json())
+        .then(data => {
+            const transactionCards = document.getElementById('stocktransaction-cards');
+            transactionCards.innerHTML = ''; // Kosongkan card sebelumnya
+
+            data.forEach(stocktransaction => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
             <h4>${stocktransaction.id_barang}</h4>
             <p>Jumlah: ${stocktransaction.jumlah}</p>
             <p>Jenis: ${stocktransaction.jenis_transaksi}</p>
             <p>Tanggal: ${new Date(stocktransaction.tanggal).toLocaleDateString()}</p>
           `;
-          transactionCards.appendChild(card);
+                transactionCards.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Error fetching transactions:', error));
+}
+
+function populateStockDropdown() {
+    const stockSelect = document.getElementById("item_name");
+
+    if (!stockSelect) {
+        console.error("Dropdown stock tidak ditemukan di DOM!");
+        return;
+    }
+
+    // Ambil data pelanggan dari localStorage
+    const storedStocks = localStorage.getItem("stockData");
+
+    if (storedStocks) {
+        const stocks = JSON.parse(storedStocks);
+        console.log("Data stok dari localStorage:", stocks);
+
+        // Reset dropdown sebelum mengisi ulang
+        stockselect.innerHTML = `<option value="" disabled selected>Pilih Nama item</option>`;
+
+        stocks.forEach(stock => {
+            const option = document.createElement("option");
+            option.value = stock.item_name;
+            option.textContent = stock.item_name;
+            stockselect.appendChild(option);
         });
-      })
-      .catch(error => console.error('Error fetching transactions:', error));
+
+        console.log("Dropdown stok berhasil diisi!");
+    } else {
+        console.warn("Data stok tidak ditemukan di localStorage.");
+    }
 }
