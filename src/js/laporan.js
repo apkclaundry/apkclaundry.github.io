@@ -360,11 +360,19 @@ document.addEventListener("DOMContentLoaded", () => {
 //hilangkan card ketika dropdown tabel Gaji di pilih
 function toggleCardsVisibility(selectedOption) {
   const cardsContainer = document.querySelector(".row.mb-5"); // Ambil container card
+  const supplierCard = document.querySelector(".card.bg-danger"); // Ambil card total supplier
+  const otherCards = document.querySelectorAll(".row.mb-5 .card:not(.bg-danger)"); // Ambil card selain total supplier
   
   if (selectedOption === "Gaji") {
     cardsContainer.style.display = "none"; // Sembunyikan jika pilih Gaji
+  } else if (selectedOption === "Supplier") {
+    cardsContainer.style.display = "flex"; // Tampilkan container card
+    supplierCard.style.display = "block"; // Tampilkan card total supplier
+    otherCards.forEach(card => card.style.display = "none"); // Sembunyikan card lain
   } else {
-    cardsContainer.style.display = "flex"; // Tampilkan jika pilih Laundry atau lainnya
+    cardsContainer.style.display = "flex"; // Tampilkan container card
+    supplierCard.style.display = "none"; // Sembunyikan card total supplier
+    otherCards.forEach(card => card.style.display = "block"); // Tampilkan card lain
   }
 }
 
@@ -604,7 +612,11 @@ async function renderTableSupplier() {
   toggleMobileView("Supplier");
 }
 
-
+async function calculateSupplierExpenditure() {
+  const suppliers = await fetchSupplierData();
+  const totalExpenditure = suppliers.reduce((sum, { total_amount }) => sum + total_amount, 0);
+  document.getElementById("supplierTotal").textContent = `Rp ${totalExpenditure.toLocaleString("id-ID")}`;
+}
 
 document.getElementById("filterPeriod").addEventListener("change", async (event) => {
   const selectedValue = event.target.value;
@@ -619,6 +631,7 @@ document.getElementById("filterPeriod").addEventListener("change", async (event)
 
   if (selectedValue === "Supplier") {
     await renderTableSupplier();
+    await calculateSupplierExpenditure();
   } else if (selectedValue === "Gaji") {
     await renderTableSalary();
   } else {
@@ -633,6 +646,7 @@ document.getElementById("filterPeriod").addEventListener("change", async (event)
 
   if (selectedValue === "Supplier") {
     await renderTableSupplier();
+    await calculateSupplierExpenditure();
   } else if (selectedValue === "Laundry") {
     await renderTableLaundry();
   } else {
@@ -642,5 +656,18 @@ document.getElementById("filterPeriod").addEventListener("change", async (event)
   toggleMobileView(selectedValue);
 });
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultOption = document.getElementById("filterPeriod").options[document.getElementById("filterPeriod").selectedIndex].text;
+  if (defaultOption === "Supplier") {
+    renderTableSupplier();
+    calculateSupplierExpenditure();
+  } else if (defaultOption === "Gaji") {
+    renderTableSalary();
+  } else {
+    renderTableLaundry();
+  }
+  toggleMobileView(defaultOption);
+});
 
 renderTableSupplier();
