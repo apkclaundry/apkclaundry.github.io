@@ -24,64 +24,35 @@ function getAuthToken() {
 async function getSuppliers() {
   const token = getAuthToken();
   try {
-    const response = await fetch('https://apkclaundry.vercel.app/supplier', {
+    const response = await fetch("https://apkclaundry.vercel.app/supplier", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok) throw new Error('Gagal mengambil data supplier');
-    const suppliers = await response.json();
-    return suppliers;
+
+    if (!response.ok) throw new Error("Gagal mengambil data supplier");
+
+    const result = await response.json();
+    console.log("Response dari API:", result); // Debugging
+
+    if (!Array.isArray(result)) {
+      throw new Error("Format data tidak sesuai, seharusnya array.");
+    }
+
+    return result; // Mengembalikan langsung array supplier
   } catch (error) {
-    console.error(error);
-    Swal.fire('Error', error.message, 'error');
+    console.error("Error saat mengambil supplier:", error.message);
+    Swal.fire("Error", error.message, "error");
     return [];
-  }
-}
-
-async function addSupplier() {
-  const token = getAuthToken();
-  const supplierName = document.getElementById("supplier-name").value.trim();
-  const phoneNumber = document.getElementById("supplier-phone").value.trim();
-  const address = document.getElementById("supplier-address").value.trim();
-  const email = document.getElementById("supplier-email").value.trim();
-  const suppliedProducts = document
-    .getElementById("supplier-products")
-    .value.trim()
-    .split(","); // Mengubah string menjadi array
-
-  if (!supplierName || !phoneNumber || !address || !email || !suppliedProducts.length) {
-    Swal.fire('Peringatan', 'Semua field wajib diisi!', 'warning');
-    return;
-  }
-
-  try {
-    const response = await fetch('https://apkclaundry.vercel.app/supplier', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ supplier_name: supplierName, phone_number: phoneNumber, address, email, supplied_products: suppliedProducts })
-    });
-
-    if (!response.ok) throw new Error('Gagal menambahkan supplier');
-    Swal.fire('Sukses', 'Supplier berhasil ditambahkan!', 'success');
-    displaySuppliers();
-    document.getElementById("supplier-form").reset(); // Reset form
-  } catch (error) {
-    console.error(error);
-    Swal.fire('Error', error.message, 'error');
   }
 }
 
 async function editSupplier(supplierId) {
   const token = getAuthToken();
-  console.log('Edit Supplier ID:', supplierId); // Debugging
   if (!supplierId) {
-    Swal.fire('Error', 'ID supplier tidak ditemukan', 'error');
+    Swal.fire("Error", "ID supplier tidak ditemukan", "error");
     return;
   }
 
@@ -93,13 +64,13 @@ async function editSupplier(supplierId) {
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok) throw new Error('Gagal mengambil data supplier');
+
+    if (!response.ok) throw new Error("Gagal mengambil data supplier");
     
     const supplier = await response.json();
-    console.log('Supplier data:', supplier); // Debugging
 
     Swal.fire({
-      title: 'Edit Data Supplier',
+      title: "Edit Data Supplier",
       html: `
         <input id="swal-name" class="swal2-input" value="${supplier.supplier_name}" placeholder="Nama Supplier">
         <input id="swal-phone" class="swal2-input" value="${supplier.phone_number}" placeholder="Telepon">
@@ -109,47 +80,72 @@ async function editSupplier(supplierId) {
       `,
       focusConfirm: false,
       preConfirm: async () => {
-        const supplier_name = document.getElementById('swal-name').value.trim();
-        const phone_number = document.getElementById('swal-phone').value.trim();
-        const address = document.getElementById('swal-address').value.trim();
-        const email = document.getElementById('swal-email').value.trim();
-        const supplied_products = document
-          .getElementById('swal-products')
-          .value.trim()
-          .split(","); // Mengubah input menjadi array
+        const supplier_name = document.getElementById("swal-name").value.trim();
+        const phone_number = document.getElementById("swal-phone").value.trim();
+        const address = document.getElementById("swal-address").value.trim();
+        const email = document.getElementById("swal-email").value.trim();
+        const supplied_products = document.getElementById("swal-products").value.trim().split(",");
 
         if (!supplier_name || !phone_number || !address || !email || !supplied_products.length) {
           Swal.showValidationMessage("Mohon lengkapi data!");
           return;
         }
-        
+
         try {
           const updateResponse = await fetch(`https://apkclaundry.vercel.app/supplier-id?id=${supplierId}`, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ supplier_name, phone_number, address, email, supplied_products })
+            body: JSON.stringify({ supplier_name, phone_number, address, email, supplied_products }),
           });
 
-          if (!updateResponse.ok) throw new Error('Gagal memperbarui data supplier');
-          Swal.fire('Sukses', 'Data supplier diperbarui!', 'success');
+          if (!updateResponse.ok) throw new Error("Gagal memperbarui data supplier");
+          Swal.fire("Sukses", "Data supplier diperbarui!", "success");
           displaySuppliers();
         } catch (error) {
           console.error("Error updating supplier:", error);
           Swal.fire("Error!", "Gagal memperbarui data supplier.", "error");
         }
-      }
+      },
     });
   } catch (error) {
     console.error("Error fetching supplier:", error);
-    Swal.fire({
-      title: "Error!",
-      text: "Gagal mengambil data supplier.",
-      icon: "error",
-      confirmButtonText: "OK",
+    Swal.fire("Error!", "Gagal mengambil data supplier.", "error");
+  }
+}
+
+// Fungsi untuk menambahkan supplier
+async function addSupplier() {
+  const token = getAuthToken();
+  const supplier_name = document.getElementById("supplier-name").value.trim();
+  const phone_number = document.getElementById("supplier-phone").value.trim();
+  const address = document.getElementById("supplier-address").value.trim();
+  const email = document.getElementById("supplier-email").value.trim();
+  const supplied_products = document.getElementById("supplier-products").value.trim().split(",");
+
+  if (!supplier_name || !phone_number || !address || !email || !supplied_products.length) {
+    Swal.fire("Error", "Mohon lengkapi data!", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch("https://apkclaundry.vercel.app/supplier", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ supplier_name, phone_number, address, email, supplied_products }),
     });
+
+    if (!response.ok) throw new Error("Gagal menambahkan supplier");
+    Swal.fire("Sukses", "Supplier berhasil ditambahkan!", "success");
+    displaySuppliers();
+  } catch (error) {
+    console.error("Error adding supplier:", error);
+    Swal.fire("Error!", "Gagal menambahkan supplier.", "error");
   }
 }
 
@@ -200,14 +196,19 @@ async function deleteSupplier(supplierId) {
   });
 }
 
+// Fungsi untuk menampilkan supplier
 async function displaySuppliers() {
   const suppliers = await getSuppliers();
 
-  orderTableBody.innerHTML = "";
+  const orderTableBody = document.querySelector("#supplier-table tbody");
   const supplierList = document.querySelector(".supplier-list");
-  supplierList.innerHTML = "";
+  const transactionTableBody = document.getElementById("transactionTableBody");
 
-  suppliers.forEach(supplier => {
+  orderTableBody.innerHTML = "";
+  supplierList.innerHTML = "";
+  transactionTableBody.innerHTML = "";
+
+  suppliers.forEach((supplier) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${supplier.id}</td>
@@ -223,10 +224,14 @@ async function displaySuppliers() {
         <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">
           <i class="fas fa-trash"></i>
         </button>
+        <button class="btn btn-sm btn-success" onclick="addSupplierTransaction('${supplier.id}')">
+          <i class="fas fa-plus"></i> Transaksi
+        </button>
       </td>
     `;
     orderTableBody.appendChild(row);
 
+    // Buat tampilan supplier dalam bentuk kartu
     const card = document.createElement("div");
     card.classList.add("supplier-item");
     card.innerHTML = `
@@ -235,7 +240,28 @@ async function displaySuppliers() {
       <p><strong>Nomor Telepon:</strong> ${supplier.phone_number}</p>
       <p><strong>Alamat:</strong> ${supplier.address}</p>
       <p><strong>Email:</strong> ${supplier.email}</p>
-      <p><strong>Produk yang Disuplai:</strong> ${supplier.supplied_products.join(", ")}</p>
+      <p><strong>Produk yang Disuplai:</strong> ${supplier.supplied_products.map((p) => `<li>${p.trim()}</li>`).join("")}</p>
+      
+      <h4>Transaksi</h4>
+      ${supplier.transactions && supplier.transactions.length > 0 ? `
+        <ul>
+          ${supplier.transactions.map(transaction => `
+            <li>
+              <strong>ID Transaksi:</strong> ${transaction.transaction_id} <br>
+              <strong>Total:</strong> Rp${transaction.total_amount.toLocaleString()} <br>
+              <strong>Metode Pembayaran:</strong> ${transaction.payment_method} <br>
+              <strong>Tanggal:</strong> ${new Date(transaction.date).toLocaleDateString()} <br>
+              <strong>Item:</strong> 
+              <ul>
+                ${transaction.items_purchased.map(item => `
+                  <li>${item.item_name} - ${item.quantity} x Rp${item.unit_price.toLocaleString()} = Rp${item.total_price.toLocaleString()}</li>
+                `).join("")}
+              </ul>
+            </li>
+          `).join("")}
+        </ul>
+      ` : `<p>Tidak ada transaksi</p>`}
+
       <div class="actions">
         <button class="btn btn-sm btn-warning" onclick="editSupplier('${supplier.id}')">
           <i class="fas fa-edit"></i>
@@ -243,9 +269,108 @@ async function displaySuppliers() {
         <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">
           <i class="fas fa-trash"></i>
         </button>
+        <button class="btn btn-sm btn-success" onclick="addSupplierTransaction('${supplier.id}')">
+          <i class="fas fa-plus"></i> Transaksi
+        </button>
       </div>
     `;
+    
     supplierList.appendChild(card);
+
+    // Tambahkan transaksi ke tabel transaksi
+    supplier.transactions.forEach(transaction => {
+      const transactionRow = document.createElement("tr");
+      transactionRow.innerHTML = `
+        <td>${transaction.transaction_id}</td>
+        <td>${supplier.supplier_name}</td>
+        <td>${new Date(transaction.date).toLocaleDateString()}</td>
+        <td>Rp${transaction.total_amount.toLocaleString()}</td>
+        <td>${transaction.payment_method}</td>
+      `;
+      transactionTableBody.appendChild(transactionRow);
+    });
+  });
+}
+
+async function addSupplierTransaction(supplierId) {
+  const token = getAuthToken();
+  if (!supplierId) {
+    Swal.fire("Error", "ID supplier tidak ditemukan", "error");
+    return;
+  }
+
+  Swal.fire({
+    title: "Tambah Transaksi Supplier",
+    html: `
+      <input id="swal-transaction-total" class="swal2-input" placeholder="Total Transaksi">
+      <input id="swal-transaction-method" class="swal2-input" placeholder="Metode Pembayaran">
+      <input id="swal-transaction-date" class="swal2-input" type="date" placeholder="Tanggal Transaksi">
+      <textarea id="swal-transaction-items" class="swal2-textarea" placeholder="Item (format: nama, jumlah, harga)"></textarea>
+    `,
+    focusConfirm: false,
+    preConfirm: async () => {
+      const total_amount = parseFloat(document.getElementById("swal-transaction-total").value.trim());
+      const payment_method = document.getElementById("swal-transaction-method").value.trim();
+      const date = new Date(document.getElementById("swal-transaction-date").value).toISOString();
+      const itemsInput = document.getElementById("swal-transaction-items").value.trim();
+
+      if (isNaN(total_amount) || !payment_method || !date || !itemsInput) {
+        Swal.showValidationMessage("Mohon lengkapi data transaksi!");
+        return;
+      }
+
+      // Konversi input item ke format JSON
+      const items_purchased = itemsInput.split("\n").map((item) => {
+        const parts = item.split(",").map((i) => i.trim());
+        if (parts.length !== 3) {
+          Swal.showValidationMessage("Format item tidak valid! Gunakan format: nama, jumlah, harga per item");
+          return null;
+        }
+        
+        const [item_name, quantity, unit_price] = parts;
+        if (!item_name || isNaN(quantity) || isNaN(unit_price)) {
+          Swal.showValidationMessage("Format item salah! Gunakan format: nama, jumlah, harga");
+          return null;
+        }
+      
+        return {
+          item_name,
+          quantity: parseInt(quantity),
+          unit_price: parseFloat(unit_price),
+          total_price: parseFloat((parseInt(quantity) * parseFloat(unit_price)).toFixed(2))
+        };
+      }).filter(item => item !== null);
+
+      // Validasi apakah semua item valid
+      if (items_purchased.some((item) => !item)) return;
+
+      try {
+        const response = await fetch(`https://apkclaundry.vercel.app/supplier/transaction?supplier_id=${supplierId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            total_amount,
+            payment_method,
+            date,
+            items_purchased,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error response:", errorData);
+          throw new Error(errorData.error || "Gagal menambahkan transaksi supplier");
+        }
+        Swal.fire("Sukses", "Transaksi supplier berhasil ditambahkan!", "success");
+        displaySuppliers();
+      } catch (error) {
+        console.error("Error adding supplier transaction:", error);
+        Swal.fire("Error!", error.message, "error");
+      }
+    },
   });
 }
 
@@ -263,4 +388,5 @@ if (saveButton) {
 document.addEventListener("DOMContentLoaded", displaySuppliers);
 window.editSupplier = editSupplier;
 window.deleteSupplier = deleteSupplier;
+window.addSupplierTransaction = addSupplierTransaction;
 
