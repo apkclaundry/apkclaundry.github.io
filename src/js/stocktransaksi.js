@@ -73,7 +73,7 @@ async function fetchStocksTransactions() {
     try {
         console.log("Fetching stocks transactions with token:", token);
 
-        const response = await fetch("https://apkclaundry.vercel.app/transaksi-stok", {
+        const response = await fetch("https://apkclaundry.vercel.app/item-transaction", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -164,14 +164,14 @@ function displayStocksTransactions(stockstransactions) {
 fetchItems();
 fetchStocksTransactions();
 
-document.getElementById('stockTransactionForm').addEventListener('submit', function (event) {
+document.getElementById('save-btn').addEventListener('click', function (event) {
     event.preventDefault();
 
     const itemId = document.getElementById('itemID').value;  // Perbaiki ID sesuai
     const quantity = document.getElementById('quantity').value;
     const type = document.getElementById('transactionType').value;
 
-    fetch('https://apkclaundry.vercel.app/transaksi-stok', {
+    fetch('https://apkclaundry.vercel.app/item-transaction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -195,7 +195,7 @@ document.getElementById('stockTransactionForm').addEventListener('submit', funct
 
   // Perbarui fungsi update stok transaksi
 function updateStockTransactionTable() {
-    fetch('https://apkclaundry.vercel.app/transaksi-stok')
+    fetch('https://apkclaundry.vercel.app/item-transaction')
       .then(response => response.json())
       .then(data => {
         const tableBody = document.getElementById('stocktransaction-table').getElementsByTagName('tbody')[0];
@@ -222,7 +222,7 @@ function updateStockTransactionTable() {
   
 // Update Kartu Transaksi
 function updateStockTransactionCards() {
-    fetch('https://apkclaundry.vercel.app/transaksi-stok')
+    fetch('https://apkclaundry.vercel.app/item-transaction')
       .then(response => response.json())
       .then(data => {
         const transactionCards = document.getElementById('stocktransaction-cards');
