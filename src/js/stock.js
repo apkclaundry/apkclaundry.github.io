@@ -3,9 +3,6 @@ import { addCSS } from "https://cdn.jsdelivr.net/gh/jscroot/lib@0.0.9/element.js
 
 addCSS("https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.css");
 
-const saveButton = document.getElementById("save-btn");
-const stockForm = document.getElementById("customer-form");
-
 // Fungsi untuk mendapatkan token dari localStorage
 function getAuthToken() {
   const token = localStorage.getItem("authToken");
@@ -22,66 +19,6 @@ function getAuthToken() {
     throw new Error("Token tidak ditemukan di localStorage.");
   }
   return token;
-}
-
-// Fungsi untuk mengambil semua pelanggan
-async function getStocks() {
-    const token = getAuthToken();
-    try {
-        const response = await fetch('https://apkclaundry.vercel.app/stock', {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        if (response.status === 401) {
-            Swal.fire('Unauthorized', 'Please log in to access this resource', 'warning').then(() => {
-                window.location.href = '/login'; // Redirect to login page
-            });
-            return [];
-        }
-        if (response.status === 404) throw new Error('Data stok tidak ditemukan');
-        if (!response.ok) throw new Error('Gagal mengambil data stok');
-        const stocks = await response.json();
-        return stocks;
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Error', error.message, 'error');
-        return [];
-    }
-}
-
-// Fungsi untuk menambahkan stok baru
-async function addStock() {
-    const name = document.getElementById("item-name").value.trim();
-    const quantity = document.getElementById("item-stock").value.trim();
-    const price = document.getElementById("item-price").value.trim();
-
-    if (!name || !quantity || !price) {
-        Swal.fire('Peringatan', 'Semua field wajib diisi!', 'warning');
-        return;
-    }
-
-    const token = getAuthToken();
-    try {
-        const response = await fetch('https://apkclaundry.vercel.app/stock', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, phone, address, email })
-        });
-
-        if (!response.ok) throw new Error('Gagal menambahkan stok');
-        Swal.fire('Sukses', 'Stok berhasil ditambahkan!', 'success');
-        displayCustomers();
-        stockForm.reset();
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Error', error.message, 'error');
-    }
 }
 
 // Fungsi untuk menampilkan data stok
@@ -123,9 +60,7 @@ async function fetchStocks() {
 
 // Fungsi untuk menampilkan data ke tabel
 // Fungsi untuk menampilkan data stok dalam tabel (Desktop) dan kartu (Mobile)
-async function displayStocks() {
-  const stocks = await getStocks();
-
+function displayStocks(stocks) {
   const stockTableBody = document.querySelector("#stock-table tbody");
   const stockList = document.querySelector(".stock-list");
 
@@ -345,9 +280,5 @@ function formatRupiah(number) {
     currency: 'IDR',
   }).format(number);
 }
-
-// Event listener untuk menambahkan pelanggan
-saveButton.addEventListener("click", addStock);
-
 
 window.addEventListener("load", fetchStocks);
