@@ -143,12 +143,12 @@ async function calculateTotals() {
 
 // Jalankan perhitungan setelah data diambil dari API
 calculateTotals();
-
-//merubah tabel berdasarkan dropdown
+// Merubah tabel berdasarkan dropdown
 function updateTableHeaders(selectedOption) {
   const headers = {
     "Laundry": ["Nama Pelanggan", "Layanan", "Tanggal", "Jumlah Transaksi", "Total Pendapatan (Rp)"],
-    "Gaji": ["Nama Karyawan", "Role", "Tanggal Rekrutmen", "Tanggal Gajian", "Gaji Bulan Ini", ],
+    "Gaji": ["Nama Karyawan", "Role", "Tanggal Rekrutmen", "Tanggal Gajian", "Gaji Bulan Ini"],
+    "Supplier": ["Nama Supplier", "Email", "Produk yang Disuplai", "Total Pembelian Terakhir", "Tanggal Transaksi Terakhir"]
   };
 
   const selectedHeaders = headers[selectedOption] || headers["Laundry"]; // Default ke Laundry jika tidak ditemukan
@@ -164,6 +164,7 @@ function updateTableHeaders(selectedOption) {
     `;
   }
 }
+
 
 
 // Event Listener untuk perubahan dropdown
@@ -442,8 +443,28 @@ function renderMobileList(data, type) {
       `;
       mobileListContainer.innerHTML += card;
     });
+  } else if (type === "Supplier") {
+    data.forEach(({ supplier_name, email, supplied_products, total_amount, date }) => {
+      const card = `
+        <div class="card mb-2 p-3 shadow-sm">
+          <p><strong>Nama Supplier:</strong> ${supplier_name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Produk yang Disuplai:</strong> ${supplied_products}</p>
+          <p><strong>Total Pembelian Terakhir:</strong> Rp ${total_amount.toLocaleString("id-ID")}</p>
+          <p><strong>Tanggal Transaksi Terakhir:</strong> ${date}</p>
+        </div>
+      `;
+      mobileListContainer.innerHTML += card;
+    });
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchSupplierData();
+  fetchEmployeeSalaries();
+});
+
 
 // Modifikasi renderTable agar memanggil renderMobileList()
 async function renderTableLaundry() {
@@ -520,3 +541,106 @@ document.getElementById("filterPeriod").addEventListener("change", (event) => {
 // Inisialisasi
 calculateTotals();
 renderTable("daily");
+
+//Supplier Laporan
+async function fetchSupplierData() {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    Swal.fire("Error", "Token tidak ditemukan, silakan login kembali.", "error");
+    return [];
+  }
+
+  try {
+    const response = await fetch("https://apkclaundry.vercel.app/supplier", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) throw new Error("Gagal mengambil data supplier");
+
+    const supplierData = await response.json();
+    console.log("Data supplier dari API:", supplierData);
+
+    return supplierData.map((supplier) => {
+      const latestTransaction = supplier.transactions?.[0] || {}; // Ambil transaksi terbaru (index 0)
+      
+      return {
+        supplier_name: supplier.supplier_name || "Tidak tersedia",
+        email: supplier.email || "Tidak tersedia",
+        supplied_products: supplier.supplied_products?.join(", ") || "Tidak tersedia",
+        total_amount: latestTransaction.total_amount || 0,
+        date: latestTransaction.date ? new Date(latestTransaction.date).toLocaleDateString("id-ID") : "Tidak tersedia",
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching supplier data:", error);
+    Swal.fire("Error", "Gagal mengambil data supplier.", "error");
+    return [];
+  }
+}
+
+async function renderTableSupplier() {
+  const suppliers = await fetchSupplierData();
+  const tableBody = document.getElementById("revenueTableBody");
+  tableBody.innerHTML = "";
+
+  suppliers.forEach(({ supplier_name, email, supplied_products, total_amount, date }) => {
+    const row = `
+      <tr>
+        <td>${supplier_name}</td>
+        <td>${email}</td>
+        <td>${supplied_products}</td>
+        <td>Rp ${total_amount.toLocaleString("id-ID")}</td>
+        <td>${date}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+
+  renderMobileList(suppliers, "Supplier");
+  toggleMobileView("Supplier");
+}
+
+
+
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.value;
+  if (selectedValue === "monthly") {
+    await renderTableSupplier();
+  }
+});
+
+
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+
+  if (selectedValue === "Supplier") {
+    await renderTableSupplier();
+  } else if (selectedValue === "Gaji") {
+    await renderTableSalary();
+  } else {
+    await renderTableLaundry();
+  }
+
+  toggleMobileView(selectedValue);
+});
+
+document.getElementById("filterPeriod").addEventListener("change", async (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+
+  if (selectedValue === "Supplier") {
+    await renderTableSupplier();
+  } else if (selectedValue === "Laundry") {
+    await renderTableLaundry();
+  } else {
+    await renderTableSalary();
+  }
+
+  toggleMobileView(selectedValue);
+});
+
+
+renderTableSupplier();
