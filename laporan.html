@@ -6,6 +6,9 @@
   <title>Laporan Pendapatan</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="src/css/laporan.css">
+  <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -131,17 +134,23 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="row mb-4">
-      <div class="col-md-6 mx-auto">
-        <select id="filterPeriod" class="form-select shadow">
-          <!-- <option value="one">--Choose Option--</option> -->
-          <option value="daily">Laundry</option>
-          <option value="weekly">Gaji</option>
-          <option value="monthly">Supplier</option>
-          <option value="yearly">Stock</option>
-        </select>
-      </div>
-    </div>
+<!-- Filter Section -->
+<!-- Filter Section -->
+<div class="row mb-4">
+  <div class="col-md-6 d-flex mx-auto">
+    <select id="filterPeriod" class="form-select shadow me-2">
+      <option value="daily">Laundry</option>
+      <option value="weekly">Gaji</option>
+      <option value="monthly">Supplier</option>
+      <option value="yearly">Stock</option>
+    </select>
+    <button id="viewSalaryData" class="btn btn-info me-2" style="display: none;">
+      <i class="fas fa-eye"></i> Lihat Data Gaji
+    </button>
+  </div>
+</div>
+
+
 
     <!-- Table Section -->
     <div class="card shadow">

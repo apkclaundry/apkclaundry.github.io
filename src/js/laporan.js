@@ -147,7 +147,7 @@ calculateTotals();
 function updateTableHeaders(selectedOption) {
   const headers = {
     "Laundry": ["Nama Pelanggan", "Layanan", "Tanggal", "Jumlah Transaksi", "Total Pendapatan (Rp)"],
-    "Gaji": ["Nama Karyawan", "Role", "Tanggal Rekrutmen", "Tanggal Gajian", "Gaji Bulan Ini"],
+    "Gaji": ["Nama Karyawan", "Role", "Tanggal Rekrutmen", "Tanggal Gajian", "Gaji Bulan Ini", ],
     "Supplier": ["Nama Supplier", "Email", "Produk yang Disuplai", "Total Pembelian Terakhir", "Tanggal Transaksi Terakhir"]
   };
 
@@ -266,19 +266,31 @@ async function renderTableLaundry() {
 //tabel dropdown Gaji
 async function fetchEmployeeSalaries() {
   try {
-    // Ambil token dari localStorage
     const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("Token tidak ditemukan, pastikan pengguna sudah login.");
       return [];
     }
 
-    // Request ke API Employee dengan Authorization Token
+    // Cek apakah data gaji sudah ada di LocalStorage dan masih valid (cache 10 menit)
+    const cachedData = localStorage.getItem("employeeSalaries");
+    const cacheTime = localStorage.getItem("employeeSalariesTime");
+
+    if (cachedData && cacheTime) {
+      const now = new Date().getTime();
+      if (now - parseInt(cacheTime) < 10 * 60 * 1000) { // Cache berlaku 10 menit
+        console.log("Menggunakan data gaji dari LocalStorage");
+        return JSON.parse(cachedData);
+      }
+    }
+
+    // Jika tidak ada cache atau cache sudah kadaluarsa, ambil dari API
+    console.log("Mengambil data gaji dari API...");
     const response = await fetch("https://apkclaundry.vercel.app/employee", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` // Tambahkan token di sini
+        "Authorization": `Bearer ${token}`
       }
     });
 
@@ -288,18 +300,25 @@ async function fetchEmployeeSalaries() {
 
     const employees = await response.json();
 
-    return employees.map(employee => ({
+    const salaries = employees.map(employee => ({
       username: employee.username || "Tidak Diketahui",
       role: employee.role || "Tidak Diketahui",
       hired_date: employee.hired_date || "Tanggal Tidak Valid",
       salary_date: employee.salary_date || "Tanggal Tidak Valid",
       salary: parseInt(employee.salary) || 0
     }));
+
+    // Simpan ke LocalStorage
+    localStorage.setItem("employeeSalaries", JSON.stringify(salaries));
+    localStorage.setItem("employeeSalariesTime", new Date().getTime().toString());
+
+    return salaries;
   } catch (error) {
     console.error("Gagal mengambil data gaji:", error);
     return [];
   }
 }
+
 
 async function renderTableSalary() {
   const salaries = await fetchEmployeeSalaries();
@@ -318,7 +337,137 @@ async function renderTableSalary() {
     `;
     tableBody.innerHTML += row;
   });
+
+  renderMobileList(salaries, "Gaji");  // Menyesuaikan tampilan mobile
+  toggleMobileView("Gaji");  // Pastikan tampilan mobile diperbarui
 }
+//tombol detail gaji
+document.getElementById("filterPeriod").addEventListener("change", (event) => {
+  const selectedValue = event.target.options[event.target.selectedIndex].text;
+  const viewSalaryButton = document.getElementById("viewSalaryData");
+
+  if (selectedValue === "Gaji") {
+    viewSalaryButton.style.display = "inline-block"; // Tampilkan tombol
+  } else {
+    viewSalaryButton.style.display = "none"; // Sembunyikan tombol
+  }
+});
+
+//ambil data gaji
+document.getElementById("viewSalaryData").addEventListener("click", async () => {
+  const currentYear = new Date().getFullYear(); // Tahun saat ini (2025)
+  let yearOptions = "";
+  
+  for (let i = 0; i < 5; i++) { // Tambahkan 5 tahun terakhir (2025 - 2021)
+    yearOptions += `<option value="${currentYear - i}">${currentYear - i}</option>`;
+  }
+
+  const { value: formValues } = await Swal.fire({
+    title: "Pilih Bulan dan Tahun",
+    html: `
+      <select id="selectMonth" class="swal2-select">
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+        <option value="03">Maret</option>
+        <option value="04">April</option>
+        <option value="05">Mei</option>
+        <option value="06">Juni</option>
+        <option value="07">Juli</option>
+        <option value="08">Agustus</option>
+        <option value="09">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Desember</option>
+      </select>
+      <select id="selectYear" class="swal2-select">${yearOptions}</select>
+    `,
+    focusConfirm: false,
+    preConfirm: () => {
+      return {
+        month: document.getElementById("selectMonth").value,
+        year: document.getElementById("selectYear").value,
+      };
+    },
+  });
+
+  if (!formValues || !formValues.month || !formValues.year) {
+    Swal.fire("Batal", "Anda harus memilih bulan dan tahun!", "warning");
+    return;
+  }
+
+  const selectedMonth = formValues.month;
+  const selectedYear = formValues.year;
+
+  // Ambil token dari LocalStorage
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    Swal.fire("Unauthorized", "Token tidak ditemukan. Silakan login kembali.", "error");
+    return;
+  }
+
+  // Ambil data dari API dengan token
+  try {
+    const response = await fetch("https://apkclaundry.vercel.app/employee-salary", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` // Tambahkan token ke header
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gagal mengambil data, status: ${response.status}`);
+    }
+
+    const salaries = await response.json();
+
+    // Filter berdasarkan bulan dan tahun yang dipilih
+    const filteredSalaries = salaries.filter(salary => {
+      const [day, month, year] = salary.salary_date.split("/"); // Format "DD/MM/YYYY"
+      return month === selectedMonth && year === selectedYear;
+    });
+
+    if (filteredSalaries.length === 0) {
+      Swal.fire("Tidak Ada Data", `Tidak ada data gaji untuk ${selectedMonth}/${selectedYear}`, "info");
+      return;
+    }
+
+    // Tampilkan hasil dalam popup
+    let salaryHTML = `
+      <table class="swal2-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tanggal Gaji</th>
+            <th>Gaji (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    filteredSalaries.forEach(({ id, salary_date, salary }) => {
+      salaryHTML += `
+        <tr>
+          <td>${id}</td>
+          <td>${salary_date}</td>
+          <td>Rp ${salary.toLocaleString("id-ID")}</td>
+        </tr>
+      `;
+    });
+
+    salaryHTML += `</tbody></table>`;
+
+    Swal.fire({
+      title: `Data Gaji Bulan ${selectedMonth}/${selectedYear}`,
+      html: salaryHTML,
+      width: "600px",
+      confirmButtonText: "Tutup",
+    });
+
+  } catch (error) {
+    console.error("Gagal mengambil data:", error);
+    Swal.fire("Error", "Gagal mengambil data dari server! Pastikan Anda memiliki akses.", "error");
+  }
+});
 
 // Event Listener untuk Dropdown
 document.getElementById("filterPeriod").addEventListener("change", async (event) => {
