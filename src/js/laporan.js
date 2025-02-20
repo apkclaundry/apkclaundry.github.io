@@ -438,16 +438,18 @@ document.getElementById("viewSalaryData").addEventListener("click", async () => 
         <thead>
           <tr>
             <th>ID</th>
+            <th>Nama Karyawan</th>
             <th>Tanggal Gaji</th>
             <th>Gaji (Rp)</th>
           </tr>
         </thead>
         <tbody>
     `;
-    filteredSalaries.forEach(({ id, salary_date, salary }) => {
+    filteredSalaries.forEach(({ id, username, salary_date, salary }) => {
       salaryHTML += `
         <tr>
           <td>${id}</td>
+          <td>${username}</td>
           <td>${salary_date}</td>
           <td>Rp ${salary.toLocaleString("id-ID")}</td>
         </tr>
